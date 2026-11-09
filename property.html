@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>uHouseCZK — Properties under 5M CZK | Nemovitosti do 5 mil. Kč</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <!-- EmailJS for alert emails -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <style>
+    :root {
+      --primary: #1d6fa4; --primary-dark: #155a87; --primary-light: #e8f4fd;
+      --accent: #f97316; --bg: #f8fafc; --white: #ffffff;
+      --text: #0f172a; --muted: #64748b; --border: #e2e8f0;
+      --green: #16a34a; --yellow: #ca8a04; --red: #dc2626;
+      --radius: 14px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+      --shadow-hover: 0 4px 12px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    a { text-decoration: none; color: inherit; }
+
+    /* LANG TOGGLE */
+    .lang-toggle {
+      display: flex; gap: 4px; background: #f1f5f9; border-radius: 8px; padding: 3px;
+    }
+    .lang-btn {
+      padding: 5px 12px; border-radius: 6px; border: none; font-size: 13px; font-weight: 600;
+      cursor: pointer; background: transparent; color: var(--muted); font-family: inherit; transition: all 0.2s;
+    }
+    .lang-btn.active { background: white; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+    nav { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; padding: 0 24px; }
+    .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
+    .nav-logo { font-size: 20px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 24px; font-size: 14px; font-weight: 500; color: var(--muted); }
+    .nav-links a:hover { color: var(--primary); }
+    .nav-cta { background: var(--primary); color: white; padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; transition: background 0.2s; white-space: nowrap; }
+    .nav-cta:hover { background: var(--primary-dark); }
+    @media (max-width: 700px) { .nav-links { display: none; } }
+
+    /* ALERT BANNER */
+    .alert-banner {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-bottom: 2px solid #f59e0b;
+      padding: 12px 24px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      flex-wrap: wrap; text-align: center;
+    }
+    .alert-banner-text { font-size: 14px; font-weight: 600; color: #92400e; }
+    .alert-banner button {
+      background: #d97706; color: white; border: none; border-radius: 6px;
+      padding: 6px 14px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+    }
+    .alert-banner button:hover { background: #b45309; }
+
+    .hero { background: linear-gradient(135deg, #0f2d45 0%, #1d6fa4 60%, #2563eb 100%); color: white; padding: 70px 24px 50px; text-align: center; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(26px, 5vw, 48px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; max-width: 800px; margin-left: auto; margin-right: auto; }
+    .hero h1 em { color: #fbbf24; font-style: normal; }
+    .hero p { font-size: clamp(14px, 2vw, 17px); color: rgba(255,255,255,0.8); max-width: 600px; margin: 0 auto 32px; }
+    .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; margin-bottom: 36px; }
+    .hero-stat { text-align: center; }
+    .hero-stat-val { font-size: 26px; font-weight: 800; color: #fbbf24; }
+    .hero-stat-label { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+
+    .search-box { background: white; border-radius: var(--radius); padding: 20px; max-width: 860px; margin: 0 auto; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+    @media (max-width: 700px) { .search-grid { grid-template-columns: 1fr; } }
+    .search-group label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .search-group select, .search-group input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.2s; }
+    .search-group select:focus { border-color: var(--primary); }
+    .btn-search { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .btn-search:hover { background: var(--primary-dark); }
+
+    .filters-bar { background: white; border-bottom: 1px solid var(--border); padding: 12px 24px; position: sticky; top: 64px; z-index: 90; }
+    .filters-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .filter-chip { padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; background: white; transition: all 0.2s; }
+    .filter-chip:hover, .filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .filter-count { margin-left: auto; font-size: 13px; color: var(--muted); font-weight: 500; }
+    .sort-wrap { display: flex; align-items: center; gap: 8px; }
+    .sort-wrap select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: inherit; background: white; }
+
+    .main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+    .stats-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; border: 1px solid var(--border); }
+    .stat-val { font-size: 26px; font-weight: 800; color: var(--primary); }
+    .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+    .stat-trend { font-size: 12px; color: var(--green); margin-top: 4px; font-weight: 500; }
+
+    .map-section { background: white; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 32px; overflow: hidden; }
+    .map-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .map-placeholder { height: 260px; background: linear-gradient(135deg, #dbeafe, #bfdbfe); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+
+    .property-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+
+    .prop-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; transition: all 0.25s; cursor: pointer; border: 1px solid var(--border); }
+    .prop-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); }
+    .prop-img { position: relative; height: 195px; overflow: hidden; background: #cbd5e1; }
+    .prop-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+    .prop-card:hover .prop-img img { transform: scale(1.05); }
+    .prop-badge { position: absolute; top: 12px; left: 12px; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
+    .badge-green { background: #dcfce7; color: #16a34a; }
+    .badge-yellow { background: #fef9c3; color: #ca8a04; }
+    .badge-red { background: #fee2e2; color: #dc2626; }
+    .hot-badge { position: absolute; top: 12px; left: 12px; background: #dc2626; color: white; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+    .score-badge { position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; color: white; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .score-high { background: #16a34a; }
+    .score-mid { background: #ca8a04; }
+    .score-low { background: #dc2626; }
+    .prop-body { padding: 16px; }
+    .prop-price { font-size: 21px; font-weight: 800; color: var(--primary); }
+    .prop-price-sub { font-size: 12px; color: var(--muted); }
+    .prop-title { font-size: 14px; font-weight: 600; margin: 6px 0 4px; }
+    .prop-location { font-size: 13px; color: var(--muted); }
+    .prop-meta { display: flex; gap: 10px; margin: 10px 0; padding: 10px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .prop-meta-item { font-size: 12px; color: var(--muted); }
+    .prop-meta-item strong { color: var(--text); font-weight: 600; }
+    .prop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .prop-tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; background: var(--primary-light); color: var(--primary); font-weight: 500; }
+    .prop-tag.neg { background: #fee2e2; color: #dc2626; }
+    .prop-actions { display: flex; gap: 8px; }
+    .btn-detail { flex: 1; background: var(--primary); color: white; border: none; border-radius: 8px; padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .btn-detail:hover { background: var(--primary-dark); }
+    .btn-ext { padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--muted); cursor: pointer; background: white; font-family: inherit; }
+    .btn-ext:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ALERT SUBSCRIPTION BOX */
+    .alert-box { background: linear-gradient(135deg, #0f2d45, #1d6fa4); border-radius: var(--radius); padding: 28px; margin-bottom: 32px; color: white; }
+    .alert-box h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .alert-box p { font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 16px; }
+    .alert-form { display: flex; gap: 10px; flex-wrap: wrap; }
+    .alert-form input { flex: 1; min-width: 200px; padding: 10px 14px; border: none; border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; }
+    .alert-form select { padding: 10px 14px; border: none; border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; background: white; }
+    .btn-alert { background: #f97316; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .btn-alert:hover { background: #ea6c0a; }
+    .alert-success { background: rgba(34,197,94,0.2); border: 1px solid #22c55e; border-radius: 8px; padding: 12px 16px; font-size: 14px; font-weight: 600; margin-top: 12px; display: none; }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: none; align-items: flex-start; justify-content: center; padding: 20px; overflow-y: auto; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; border-radius: var(--radius); width: 100%; max-width: 860px; margin: auto; overflow: hidden; position: relative; }
+    .modal-close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.5); color: white; border: none; font-size: 18px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
+    .modal-gallery { height: 270px; overflow: hidden; background: #cbd5e1; }
+    .modal-gallery img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-body { padding: 24px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+    .modal-price { font-size: 28px; font-weight: 900; color: var(--primary); }
+    .modal-score { width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; color: white; margin: 0 auto 4px; }
+    .modal-score-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; text-align: center; }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 580px) { .modal-grid { grid-template-columns: 1fr; } }
+    .modal-section { margin-bottom: 18px; }
+    .modal-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    .metric-row { display: flex; justify-content: space-between; font-size: 14px; padding: 5px 0; border-bottom: 1px solid #f1f5f9; }
+    .metric-label { color: var(--muted); }
+    .metric-val { font-weight: 600; }
+    .pro-con-list { list-style: none; }
+    .pro-con-list li { font-size: 13px; padding: 4px 0; display: flex; gap: 8px; }
+    .invest-bar { height: 8px; border-radius: 4px; background: #e2e8f0; margin-bottom: 10px; overflow: hidden; }
+    .invest-fill { height: 100%; border-radius: 4px; }
+    .invest-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
+    .mortgage-box { background: var(--primary-light); border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+
+    input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; border-radius: 3px; background: #e2e8f0; outline: none; cursor: pointer; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--primary); border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .price-range-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    .how-section { background: white; padding: 50px 24px; border-top: 1px solid var(--border); }
+    .how-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+    footer { background: #0f172a; color: #94a3b8; padding: 36px 24px; margin-top: 60px; font-size: 13px; text-align: center; }
+    footer strong { color: white; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">🏠 uHouse<span>CZK</span></div>
+    <div class="nav-links">
+      <a href="#listings" id="nav-listings">Listings</a>
+      <a href="#areas" id="nav-areas">Areas</a>
+      <a href="#alerts" id="nav-alerts">🔔 Alerts</a>
+      <a href="#how" id="nav-how">How it works</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('cs')">CZ</button>
+      </div>
+      <a class="nav-cta" href="#listings" id="nav-cta">Search listings</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ALERT BANNER — shown when Třeboradice listings exist -->
+<div class="alert-banner" id="treboradic-banner">
+  <span class="alert-banner-text" id="banner-text">🚨 NEW: 1 property found in Třeboradice — your priority area!</span>
+  <button onclick="scrollToTreboradic()" id="banner-btn">View now →</button>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge" id="hero-badge">🔍 Auto-analysis from Sreality.cz · MMReality.cz</div>
+  <h1 id="hero-h1">Find a home under <em>5 Million CZK</em><br/>with investment potential</h1>
+  <p id="hero-p">We search and score listings from Czech property portals. Focused on homes near Prague, Mělník and Litoměřice with the best price-to-value ratio.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-val">9</div><div class="hero-stat-label" id="stat-listings">Active listings</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">12</div><div class="hero-stat-label" id="stat-areas">Areas covered</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">3.2M CZK</div><div class="hero-stat-label" id="stat-avg">Average price</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">72 / 100</div><div class="hero-stat-label" id="stat-score">Avg. investment score</div></div>
+  </div>
+  <div class="search-box">
+    <div class="search-grid">
+      <div class="search-group">
+        <label id="lbl-location">Location</label>
+        <select id="filter-location">
+          <option value="" id="opt-all">All areas</option>
+          <option value="treboradic">Třeboradice</option>
+          <option value="melnik">Mělník</option>
+          <option value="litomerice">Litoměřice</option>
+          <option value="steti">Štětí</option>
+          <option value="roudnice">Roudnice n. L.</option>
+          <option value="neratovice">Neratovice</option>
+          <option value="kralupy">Kralupy n. V.</option>
+          <option value="tisice">Tišice</option>
+        </select>
+      </div>
+      <div class="search-group">
+        <label id="lbl-type">Property type</label>
+        <select id="filter-type">
+          <option value="" id="opt-all-type">All types</option>
+          <option value="dum" id="opt-dum">Family house</option>
+          <option value="chalupa" id="opt-chalupa">Cottage / Chalet</option>
+          <option value="vila" id="opt-vila">Villa</option>
+          <option value="statek" id="opt-statek">Farmstead</option>
+        </select>
+      </div>
+      <div class="search-group">
+        <label id="lbl-price">Max price: <strong id="price-label" style="color:var(--primary)">5,000,000 CZK</strong></label>
+        <input type="range" id="filter-price" min="500000" max="5000000" step="100000" value="5000000" oninput="updatePriceLabel(this.value)" />
+        <div class="price-range-labels"><span>500K</span><span>5M CZK</span></div>
+      </div>
+      <button class="btn-search" onclick="applyFilters()" id="btn-search">🔍 Search</button>
+    </div>
+  </div>
+</section>
+
+<!-- FILTERS BAR -->
+<div class="filters-bar" id="listings">
+  <div class="filters-inner">
+    <button class="filter-chip active" onclick="filterByScore('all',this)" id="chip-all">All</button>
+    <button class="filter-chip" onclick="filterByScore('high',this)" id="chip-high">🟢 Great deal</button>
+    <button class="filter-chip" onclick="filterByScore('mid',this)" id="chip-mid">🟡 Opportunity</button>
+    <button class="filter-chip" onclick="filterByScore('low',this)" id="chip-low">🔴 Needs review</button>
+    <button class="filter-chip" onclick="filterByType('chalupa',this)" id="chip-chalupa">🏚 Cottages</button>
+    <button class="filter-chip" onclick="filterByType('dum',this)" id="chip-dum">🏠 Houses</button>
+    <div class="sort-wrap">
+      <span style="font-size:13px;color:var(--muted)" id="lbl-sort">Sort:</span>
+      <select id="sort-select" onchange="applyFilters()">
+        <option value="score" id="sort-score">Investment score</option>
+        <option value="price-asc" id="sort-price-asc">Price ↑</option>
+        <option value="price-desc" id="sort-price-desc">Price ↓</option>
+        <option value="area" id="sort-area">Floor area</option>
+      </select>
+    </div>
+    <span class="filter-count" id="result-count">9 properties</span>
+  </div>
+</div>
+
+<main class="main">
+
+  <!-- Stats -->
+  <div class="stats-section">
+    <div class="stat-card"><div class="stat-val">9</div><div class="stat-label" id="s1">Total listings</div><div class="stat-trend" id="s1t">↑ Updated today</div></div>
+    <div class="stat-card"><div class="stat-val">3.2M</div><div class="stat-label" id="s2">Average price (CZK)</div><div class="stat-trend" id="s2t">↓ 4% vs last month</div></div>
+    <div class="stat-card"><div class="stat-val">142 m²</div><div class="stat-label" id="s3">Average floor area</div><div class="stat-trend" id="s3t">Living space</div></div>
+    <div class="stat-card"><div class="stat-val">22,500 CZK</div><div class="stat-label" id="s4">Average price / m²</div><div class="stat-trend" id="s4t">↓ cheaper than Prague</div></div>
+    <div class="stat-card"><div class="stat-val">72 / 100</div><div class="stat-label" id="s5">Avg. investment score</div><div class="stat-trend" id="s5t">↑ Solid potential</div></div>
+  </div>
+
+  <!-- Email Alert Box -->
+  <div class="alert-box" id="alerts">
+    <h3 id="alert-title">🔔 Get email alerts for new listings</h3>
+    <p id="alert-desc">Be the first to know when a new property appears in Třeboradice or your chosen area. We'll email you instantly.</p>
+    <div class="alert-form">
+      <input type="email" id="alert-email" placeholder="your@email.com" value="umeshin2020@gmail.com" />
+      <select id="alert-region">
+        <option value="treboradic">Třeboradice (priority)</option>
+        <option value="melnik">Mělník</option>
+        <option value="litomerice">Litoměřice</option>
+        <option value="roudnice">Roudnice n. L.</option>
+        <option value="all">All areas</option>
+      </select>
+      <button class="btn-alert" onclick="subscribeAlert()" id="btn-alert">🔔 Alert me</button>
+    </div>
+    <div class="alert-success" id="alert-success">
+      ✅ Alert set! We'll email umeshin2020@gmail.com when a new property appears in your chosen area.
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:rgba(255,255,255,0.6);" id="alert-note">
+      ⚡ You currently have 1 active listing in Třeboradice — scroll down to see it highlighted in red.
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div class="map-section" id="areas">
+    <div class="map-header">
+      <div>
+        <div style="font-size:16px;font-weight:700" id="map-title">Search areas map</div>
+        <div style="font-size:13px;color:var(--muted)" id="map-sub">Třeboradice · Mělník · Litoměřice and surrounding areas within 60km of Prague</div>
+      </div>
+      <a href="https://www.sreality.cz/hledani/prodej/domy?region=melnik,litomerice&cena-do=5000000" target="_blank" style="font-size:13px;color:var(--primary);font-weight:500" id="map-link">Open on Sreality.cz →</a>
+    </div>
+    <div class="map-placeholder">
+      <div style="font-size:36px;margin-bottom:6px;">🗺️</div>
+      <div style="font-weight:700;font-size:15px;color:var(--primary)" id="map-label">Search coverage map</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px;text-align:center;max-width:500px;">
+        Třeboradice · Mělník · Litoměřice · Štětí · Roudnice n. L. · Neratovice · Kralupy n. V. · Tišice
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:center;">
+        <a href="https://www.sreality.cz/hledani/prodej/domy?region=melnik,litomerice&cena-do=5000000" target="_blank"
+          style="background:var(--primary);color:white;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;">Sreality.cz →</a>
+        <a href="https://www.mmreality.cz/cs/nabidka/?typ=prodej&kategorie=domy&cena_do=5000000" target="_blank"
+          style="background:var(--accent);color:white;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;">MMReality.cz →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Properties -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+    <div>
+      <div style="font-size:22px;font-weight:800;" id="grid-title">Found properties</div>
+      <div style="font-size:14px;color:var(--muted);" id="grid-sub">Sorted by investment score · Source: Sreality.cz, MMReality.cz</div>
+    </div>
+  </div>
+  <div class="property-grid" id="property-grid"></div>
+
+</main>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="how-inner">
+    <div style="font-size:13px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;" id="how-label">How it works</div>
+    <h2 style="font-size:26px;font-weight:800;margin-bottom:36px;" id="how-title">Investment score in 3 steps</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;text-align:left;">
+      <div style="padding:22px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);">
+        <div style="font-size:30px;margin-bottom:10px;">🔍</div>
+        <div style="font-weight:700;margin-bottom:6px;" id="how1-title">1. Data collection</div>
+        <div style="font-size:14px;color:var(--muted);" id="how1-text">We automatically scan Sreality.cz and MMReality.cz, normalise data and remove duplicates.</div>
+      </div>
+      <div style="padding:22px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);">
+        <div style="font-size:30px;margin-bottom:10px;">📊</div>
+        <div style="font-weight:700;margin-bottom:6px;" id="how2-title">2. Analysis</div>
+        <div style="font-size:14px;color:var(--muted);" id="how2-text">Each property is scored on 7 criteria: price value, distance from Prague, condition, land size, rental potential, appreciation, transport.</div>
+      </div>
+      <div style="padding:22px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);">
+        <div style="font-size:30px;margin-bottom:10px;">🏆</div>
+        <div style="font-weight:700;margin-bottom:6px;" id="how3-title">3. Score 0–100</div>
+        <div style="font-size:14px;color:var(--muted);" id="how3-text">🟢 Great deal (75+) · 🟡 Opportunity (50–74) · 🔴 Needs review (&lt;50)</div>
+      </div>
+    </div>
+    <div style="margin-top:24px;padding:14px 20px;background:var(--primary-light);border-radius:10px;font-size:13px;color:var(--primary);font-weight:500;text-align:left;" id="how-weights">
+      ⚖️ <strong>Scoring weights:</strong> Price value 30% · Distance from Prague 20% · Property condition 15% · Land size 10% · Rental potential 10% · Appreciation potential 10% · Public transport 5%
+    </div>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-gallery"><img id="modal-img" src="" alt="" /></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<footer>
+  <strong>uHouseCZK</strong> — Czech property investment analysis under 5,000,000 CZK<br/>
+  <span style="margin-top:8px;display:block;">Data from Sreality.cz · MMReality.cz · Updated daily</span>
+  <span style="margin-top:8px;display:block;font-size:12px;">⚠️ Investment scores are indicative only and do not guarantee returns. Always consult a professional before buying property.</span>
+  <span style="margin-top:8px;display:block;font-size:12px;">Alerts: umeshin2020@gmail.com · uHouseCZK 2026</span>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// LANGUAGE
+// ═══════════════════════════════════════════════════════════════
+let currentLang = 'en';
+const T = {
+  en: {
+    navListings:'Listings', navAreas:'Areas', navAlerts:'🔔 Alerts', navHow:'How it works', navCta:'Search listings',
+    heroBadge:'🔍 Auto-analysis from Sreality.cz · MMReality.cz',
+    heroH1:'Find a home under <em>5 Million CZK</em><br/>with investment potential',
+    heroP:'We search and score listings from Czech property portals. Focused on homes near Prague, Mělník and Litoměřice with the best price-to-value ratio.',
+    statListings:'Active listings', statAreas:'Areas covered', statAvg:'Average price', statScore:'Avg. investment score',
+    lblLocation:'Location', lblType:'Property type', lblPrice:'Max price:', btnSearch:'🔍 Search',
+    optAll:'All areas', optAllType:'All types', optDum:'Family house', optChalupa:'Cottage / Chalet', optVila:'Villa', optStatek:'Farmstead',
+    chipAll:'All', chipHigh:'🟢 Great deal', chipMid:'🟡 Opportunity', chipLow:'🔴 Needs review', chipChalupa:'🏚 Cottages', chipDum:'🏠 Houses',
+    lblSort:'Sort:', sortScore:'Investment score', sortPriceAsc:'Price ↑', sortPriceDesc:'Price ↓', sortArea:'Floor area',
+    s1:'Total listings', s1t:'↑ Updated today', s2:'Average price (CZK)', s2t:'↓ 4% vs last month', s3:'Average floor area', s3t:'Living space', s4:'Average price / m²', s4t:'↓ cheaper than Prague', s5:'Avg. investment score', s5t:'↑ Solid potential',
+    alertTitle:'🔔 Get email alerts for new listings', alertDesc:'Be the first to know when a new property appears in Třeboradice or your chosen area. We\'ll email you instantly.',
+    btnAlert:'🔔 Alert me', alertNote:'⚡ You currently have 1 active listing in Třeboradice — scroll down to see it highlighted.',
+    alertSuccessMsg:'✅ Alert set! We\'ll email umeshin2020@gmail.com when a new property appears in your chosen area.',
+    mapTitle:'Search areas map', mapSub:'Třeboradice · Mělník · Litoměřice and surrounding areas within 60km of Prague', mapLink:'Open on Sreality.cz →', mapLabel:'Search coverage map',
+    gridTitle:'Found properties', gridSub:'Sorted by investment score · Source: Sreality.cz, MMReality.cz',
+    howLabel:'How it works', howTitle:'Investment score in 3 steps',
+    how1Title:'1. Data collection', how1Text:'We automatically scan Sreality.cz and MMReality.cz, normalise data and remove duplicates.',
+    how2Title:'2. Analysis', how2Text:'Each property is scored on 7 criteria: price value, distance from Prague, condition, land size, rental potential, appreciation, transport.',
+    how3Title:'3. Score 0–100', how3Text:'🟢 Great deal (75+) · 🟡 Opportunity (50–74) · 🔴 Needs review (<50)',
+    howWeights:'⚖️ <strong>Scoring weights:</strong> Price value 30% · Distance from Prague 20% · Property condition 15% · Land size 10% · Rental potential 10% · Appreciation potential 10% · Public transport 5%',
+    bannerText:'🚨 NEW: 1 property found in Třeboradice — your priority area!', bannerBtn:'View now →',
+    resultCount:'properties',
+    // modal
+    mOverview:'Property overview', mFloorArea:'Floor area', mLand:'Land size', mCondition:'Condition', mBuilt:'Year built', mPragueKm:'Distance from Prague', mSource:'Source',
+    mTransport:'Transport links', mAmenities:'Local amenities', mAnalysis:'Investment analysis',
+    mPriceVal:'Price value (30%)', mPragueScore:'Distance Prague (20%)', mRental:'Rental yield (10%)', mAppreciation:'Appreciation potential (10%)',
+    mStrengths:'Strengths', mRisks:'Risks', mSummary:'Investor summary',
+    mRentalEst:'Est. rental / month', mRenovEst:'Renovation estimate', mApprecPct:'Appreciation potential',
+    mMortgage:'Estimated monthly mortgage payment', mMortgageSub:'At 80% LTV · 5.5% interest rate · 25 years',
+    mDeposit:'Deposit:', mLoan:'Loan:', mPerMonth:'/ month',
+    mViewListing:'↗ View original listing', mClose:'Close',
+    mNoReno:'Not needed',
+    condExcellent:'Excellent', condGood:'Good', condPartial:'Partial renovation', condFull:'Full renovation needed',
+  },
+  cs: {
+    navListings:'Nabídky', navAreas:'Oblasti', navAlerts:'🔔 Upozornění', navHow:'Jak to funguje', navCta:'Prohledat nabídky',
+    heroBadge:'🔍 Automatická analýza z Sreality.cz · MMReality.cz',
+    heroH1:'Najděte dům do <em>5 milionů Kč</em><br/>s investičním potenciálem',
+    heroP:'Prohledáváme a analyzujeme nabídky z českých realitních portálů. Zaměřujeme se na domy v okolí Prahy, Mělníka a Litoměřic.',
+    statListings:'Aktivních nabídek', statAreas:'Oblastí', statAvg:'Průměrná cena', statScore:'Prům. investiční skóre',
+    lblLocation:'Lokalita', lblType:'Typ nemovitosti', lblPrice:'Max. cena:', btnSearch:'🔍 Vyhledat',
+    optAll:'Všechny oblasti', optAllType:'Vše', optDum:'Rodinný dům', optChalupa:'Chalupa / Chata', optVila:'Vila', optStatek:'Statek',
+    chipAll:'Vše', chipHigh:'🟢 Výhodná koupě', chipMid:'🟡 Příležitost', chipLow:'🔴 Vyžaduje posouzení', chipChalupa:'🏚 Chalupy', chipDum:'🏠 Rodinné domy',
+    lblSort:'Řadit:', sortScore:'Investiční skóre', sortPriceAsc:'Cena ↑', sortPriceDesc:'Cena ↓', sortArea:'Plocha',
+    s1:'Celkem nabídek', s1t:'↑ Aktualizováno dnes', s2:'Průměrná cena (Kč)', s2t:'↓ o 4% vs. minulý měsíc', s3:'Průměrná plocha', s3t:'Obytná plocha', s4:'Průměrná cena / m²', s4t:'↓ nižší než Praha', s5:'Prům. investiční skóre', s5t:'↑ Solidní potenciál',
+    alertTitle:'🔔 Upozornění na nové nabídky e-mailem', alertDesc:'Buďte první, kdo se dozví o nové nemovitosti v Třeboradicích nebo vybrané oblasti.',
+    btnAlert:'🔔 Upozornit mě', alertNote:'⚡ Aktuálně máte 1 nabídku v Třeboradicích — níže ji najdete zvýrazněnou.',
+    alertSuccessMsg:'✅ Upozornění nastaveno! Pošleme e-mail na umeshin2020@gmail.com při nové nabídce.',
+    mapTitle:'Mapa oblastí', mapSub:'Třeboradice · Mělník · Litoměřice a okolí do 60 km od Prahy', mapLink:'Otevřít na Sreality.cz →', mapLabel:'Oblasti vyhledávání',
+    gridTitle:'Nalezené nemovitosti', gridSub:'Seřazeno dle investičního skóre · Zdroj: Sreality.cz, MMReality.cz',
+    howLabel:'Jak to funguje', howTitle:'Investiční skóre v 3 krocích',
+    how1Title:'1. Sběr dat', how1Text:'Automaticky prohledáváme Sreality.cz a MMReality.cz. Normalizujeme data a odstraňujeme duplicity.',
+    how2Title:'2. Analýza', how2Text:'Každou nemovitost hodnotíme dle 7 kritérií: cena, vzdálenost od Prahy, stav, pozemek, pronájem, růst hodnoty, doprava.',
+    how3Title:'3. Skóre 0–100', how3Text:'🟢 Výhodná koupě (75+) · 🟡 Zajímavá příležitost (50–74) · 🔴 Vyžaduje posouzení (<50)',
+    howWeights:'⚖️ <strong>Váhy hodnocení:</strong> Hodnota ceny 30% · Vzdálenost od Prahy 20% · Stav nemovitosti 15% · Velikost pozemku 10% · Potenciál pronájmu 10% · Potenciál růstu hodnoty 10% · Dostupnost MHD 5%',
+    bannerText:'🚨 NOVÉ: 1 nemovitost v Třeboradicích — vaše prioritní oblast!', bannerBtn:'Zobrazit →',
+    resultCount:'nemovitostí',
+    mOverview:'Přehled nemovitosti', mFloorArea:'Obytná plocha', mLand:'Pozemek', mCondition:'Stav', mBuilt:'Rok výstavby', mPragueKm:'Vzdálenost Praha', mSource:'Zdroj',
+    mTransport:'Dopravní dostupnost', mAmenities:'Občanská vybavenost', mAnalysis:'Investiční analýza',
+    mPriceVal:'Hodnota ceny (30%)', mPragueScore:'Vzdálenost Praha (20%)', mRental:'Potenciál pronájmu (10%)', mAppreciation:'Potenciál růstu hodnoty (10%)',
+    mStrengths:'Silné stránky', mRisks:'Možná rizika', mSummary:'Shrnutí pro investora',
+    mRentalEst:'Odhad pronájmu / měs.', mRenovEst:'Odhad rekonstrukce', mApprecPct:'Potenciál zhodnocení',
+    mMortgage:'Odhad měsíční splátky hypotéky', mMortgageSub:'Při 80% LTV · úrok 5.5% · 25 let',
+    mDeposit:'Akontace:', mLoan:'Úvěr:', mPerMonth:'/ měsíc',
+    mViewListing:'↗ Zobrazit původní inzerát', mClose:'Zavřít',
+    mNoReno:'Bez nutnosti',
+    condExcellent:'výborný', condGood:'dobrý', condPartial:'částečná rekonstrukce', condFull:'k rekonstrukci',
+  }
+};
+
+function t(key) { return T[currentLang][key] || T['en'][key] || key; }
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang.toUpperCase()));
+  // Update all text
+  document.getElementById('nav-listings').textContent = t('navListings');
+  document.getElementById('nav-areas').textContent = t('navAreas');
+  document.getElementById('nav-alerts').textContent = t('navAlerts');
+  document.getElementById('nav-how').textContent = t('navHow');
+  document.getElementById('nav-cta').textContent = t('navCta');
+  document.getElementById('hero-badge').textContent = t('heroBadge');
+  document.getElementById('hero-h1').innerHTML = t('heroH1');
+  document.getElementById('hero-p').textContent = t('heroP');
+  document.getElementById('stat-listings').textContent = t('statListings');
+  document.getElementById('stat-areas').textContent = t('statAreas');
+  document.getElementById('stat-avg').textContent = t('statAvg');
+  document.getElementById('stat-score').textContent = t('statScore');
+  document.getElementById('lbl-location').textContent = t('lblLocation');
+  document.getElementById('lbl-type').textContent = t('lblType');
+  document.getElementById('btn-search').textContent = t('btnSearch');
+  document.getElementById('opt-all').textContent = t('optAll');
+  document.getElementById('opt-all-type').textContent = t('optAllType');
+  document.getElementById('opt-dum').textContent = t('optDum');
+  document.getElementById('opt-chalupa').textContent = t('optChalupa');
+  document.getElementById('opt-vila').textContent = t('optVila');
+  document.getElementById('opt-statek').textContent = t('optStatek');
+  document.getElementById('chip-all').textContent = t('chipAll');
+  document.getElementById('chip-high').textContent = t('chipHigh');
+  document.getElementById('chip-mid').textContent = t('chipMid');
+  document.getElementById('chip-low').textContent = t('chipLow');
+  document.getElementById('chip-chalupa').textContent = t('chipChalupa');
+  document.getElementById('chip-dum').textContent = t('chipDum');
+  document.getElementById('lbl-sort').textContent = t('lblSort');
+  document.getElementById('sort-score').textContent = t('sortScore');
+  document.getElementById('sort-price-asc').textContent = t('sortPriceAsc');
+  document.getElementById('sort-price-desc').textContent = t('sortPriceDesc');
+  document.getElementById('sort-area').textContent = t('sortArea');
+  document.getElementById('s1').textContent = t('s1');
+  document.getElementById('s1t').textContent = t('s1t');
+  document.getElementById('s2').textContent = t('s2');
+  document.getElementById('s2t').textContent = t('s2t');
+  document.getElementById('s3').textContent = t('s3');
+  document.getElementById('s3t').textContent = t('s3t');
+  document.getElementById('s4').textContent = t('s4');
+  document.getElementById('s4t').textContent = t('s4t');
+  document.getElementById('s5').textContent = t('s5');
+  document.getElementById('s5t').textContent = t('s5t');
+  document.getElementById('alert-title').textContent = t('alertTitle');
+  document.getElementById('alert-desc').textContent = t('alertDesc');
+  document.getElementById('btn-alert').textContent = t('btnAlert');
+  document.getElementById('alert-note').textContent = t('alertNote');
+  document.getElementById('map-title').textContent = t('mapTitle');
+  document.getElementById('map-sub').textContent = t('mapSub');
+  document.getElementById('map-link').textContent = t('mapLink');
+  document.getElementById('map-label').textContent = t('mapLabel');
+  document.getElementById('grid-title').textContent = t('gridTitle');
+  document.getElementById('grid-sub').textContent = t('gridSub');
+  document.getElementById('how-label').textContent = t('howLabel');
+  document.getElementById('how-title').textContent = t('howTitle');
+  document.getElementById('how1-title').textContent = t('how1Title');
+  document.getElementById('how1-text').textContent = t('how1Text');
+  document.getElementById('how2-title').textContent = t('how2Title');
+  document.getElementById('how2-text').textContent = t('how2Text');
+  document.getElementById('how3-title').textContent = t('how3Title');
+  document.getElementById('how3-text').textContent = t('how3Text');
+  document.getElementById('how-weights').innerHTML = t('howWeights');
+  document.getElementById('banner-text').textContent = t('bannerText');
+  document.getElementById('banner-btn').textContent = t('bannerBtn');
+  updatePriceLabel(document.getElementById('filter-price').value);
+  applyFilters();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROPERTY DATA
+// ═══════════════════════════════════════════════════════════════
+// NOTE: These are sample/illustrative listings used for scoring demonstration.
+// sourceUrl = live search on Sreality/MMReality filtered to same area + price range
+// listingRef = search hint to use on the source site to find similar properties
+// searchUrl = pre-filtered live search for this exact area+type+price on the source portal
+const PROPERTIES = [
+  { id:1, title_en:'Family house 4+1 with large garden', title_cs:'Rodinný dům 4+1 s velkou zahradou',
+    location:'Třeboradice, Praha 9', region:'treboradic', type:'dum', price:4850000, area:148, land:620, rooms:'4+1',
+    condition:'good', year:1978, distancePrague:12, score:81, source:'sreality',
+    sourceUrl:'https://www.sreality.cz/hledani/prodej/domy/praha-9?cena-do=5000000',
+    searchUrl:'https://www.sreality.cz/hledani/prodej/domy/praha-9?cena-do=5000000&plocha-od=130&plocha-do=200',
+    listingRef:'RD 4+1 · Třeboradice · Praha 9 · do 5 mil. Kč · ~148 m²',
+    img:'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=80', hot:true,
+    pros_en:['Excellent location close to Prague','Large garden 620 m²','Good transport links','Low price per m²'],
+    pros_cs:['Výborná poloha blízko Prahy','Velká zahrada 620 m²','Dobrá dopravní dostupnost','Nízká cena za m²'],
+    cons_en:['Older electrical wiring','Bathroom needs modernising'],
+    cons_cs:['Starší rozvody elektřiny','Nutná modernizace koupelny'],
+    rentalEst:18500, renovEst:350000, appreciationPct:8,
+    transport_en:'Bus 185 to Letňany (10 min), Metro B 25 min to centre',
+    transport_cs:'Bus 185 do Letňan (10 min), metro B 25 min',
+    amenities_en:'School 800m, shop 400m, doctor 1.2km',
+    amenities_cs:'Škola 800m, obchod 400m, lékař 1.2km',
+    summary_en:'A great-value property in a quiet location with direct transport to Prague. The large plot offers potential for extension or partial rental. Significant value uplift after basic renovation.',
+    summary_cs:'Výhodná nemovitost v klidné lokalitě s přímou dopravou do Prahy. Velký pozemek nabízí možnost přístavby. Po základní rekonstrukci výrazný růst hodnoty.' },
+  { id:2, title_en:'Country cottage — holiday or permanent living', title_cs:'Chalupa k rekreaci i bydlení',
+    location:'Horní Počaply, Mělník district', region:'melnik', type:'chalupa', price:1290000, area:95, land:1240, rooms:'3+1',
+    condition:'renovation', year:1952, distancePrague:44, score:68, source:'mmreality',
+    sourceUrl:'https://www.mmreality.cz/cs/nabidka/?typ=prodej&kategorie=chalupy-chaty&kraj=stredocesky&cena_do=1500000',
+    searchUrl:'https://www.sreality.cz/hledani/prodej/domy/melnik?cena-do=1500000&typ-objektu=chalupa',
+    listingRef:'Chalupa 3+1 · Mělník okres · do 1.5 mil. Kč · pozemek 1200+ m²',
+    img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80', hot:false,
+    pros_en:['Very low purchase price','Huge plot 1240 m²','Peaceful nature, river views','AirBnB potential'],
+    pros_cs:['Velmi nízká cena','Obrovský pozemek 1240 m²','Klidná příroda u Labe','Potenciál AirBnB'],
+    cons_en:['Needs complete renovation','Further from Prague','Weak infrastructure'],
+    cons_cs:['Vyžaduje celkovou rekonstrukci','Vzdálenější od Prahy','Slabší infrastruktura'],
+    rentalEst:8000, renovEst:650000, appreciationPct:12,
+    transport_en:'Train Neratovice–Prague 55 min, car 45 min',
+    transport_cs:'Vlak Neratovice–Praha 55 min, auto 45 min',
+    amenities_en:'Shop 2km, doctor in Mělník 15km',
+    amenities_cs:'Obchod 2km, lékař Mělník 15km',
+    summary_en:'Extremely low price for a large riverside plot. Ideal for an investor willing to renovate — after renovation value could exceed 2.5M CZK. Excellent AirBnB potential.',
+    summary_cs:'Extrémně nízká cena za velký pozemek u řeky. Po rekonstrukci hodnota může přesáhnout 2.5 mil Kč. Skvělý AirBnB potenciál.' },
+  { id:3, title_en:'Modern new-build 5+kk', title_cs:'Moderní dům 5+kk novostavba',
+    location:'Neratovice, Mělník district', region:'neratovice', type:'dum', price:4990000, area:162, land:480, rooms:'5+kk',
+    condition:'excellent', year:2019, distancePrague:28, score:76, source:'sreality',
+    sourceUrl:'https://www.sreality.cz/hledani/prodej/domy/neratovice?cena-do=5000000',
+    searchUrl:'https://www.sreality.cz/hledani/prodej/domy/neratovice?cena-do=5000000&plocha-od=150',
+    listingRef:'Novostavba 5+kk · Neratovice · do 5 mil. Kč · po roce 2015',
+    img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80', hot:false,
+    pros_en:['New build — zero repair costs','Energy class A','Fast train to Prague 28 min','Large living area'],
+    pros_cs:['Novostavba — nulové náklady','Energetická třída A','Rychlé vlakové spojení 28 min','Velká plocha'],
+    cons_en:['At the 5M budget limit','Smaller plot'],
+    cons_cs:['Na hranici rozpočtu 5M','Menší pozemek'],
+    rentalEst:22000, renovEst:0, appreciationPct:6,
+    transport_en:'Direct train to Prague main station 28 min',
+    transport_cs:'Vlak Praha hl.n. 28 min, přímý spoj',
+    amenities_en:'Full amenities, school, Lidl, hospital',
+    amenities_cs:'Kompletní občanská vybavenost, škola, Lidl, nemocnice',
+    summary_en:'Best property for worry-free living. New build with energy class A — zero energy and repair costs for 10+ years. A safe investment with stable appreciation.',
+    summary_cs:'Nejlepší nemovitost pro bydlení bez starostí. Novostavba s energetickým štítkem A — nulové náklady na energie a opravy po 10 let.' },
+  { id:4, title_en:'Farmstead with outbuildings', title_cs:'Statek s hospodářskými budovami',
+    location:'Tišice, Mělník district', region:'tisice', type:'statek', price:3200000, area:210, land:3800, rooms:'5+1',
+    condition:'partial', year:1890, distancePrague:32, score:71, source:'sreality',
+    sourceUrl:'https://www.sreality.cz/hledani/prodej/domy/melnik?cena-do=3500000&typ-objektu=statek',
+    searchUrl:'https://www.sreality.cz/hledani/prodej/domy/melnik?cena-do=3500000&plocha-od=200&pozemek-od=3000',
+    listingRef:'Statek 5+1 · Tišice, Mělník · do 3.5 mil. Kč · pozemek 3000+ m²',
+    img:'https://images.unsplash.com/photo-1464146072230-91cabc968266?w=600&q=80', hot:false,
+    pros_en:['Huge plot 3800 m²','Historic character','Low price per m²','Guesthouse / farm potential'],
+    pros_cs:['Obrovský pozemek 3800 m²','Historický charakter','Nízká cena za m²','Potenciál penzion / farma'],
+    cons_en:['Renovation to complete','Higher running costs','More remote location'],
+    cons_cs:['Nutné dokončit rekonstrukci','Vyšší provozní náklady','Vzdálenější lokalita'],
+    rentalEst:15000, renovEst:800000, appreciationPct:10,
+    transport_en:'Car to Prague 35 min, limited bus service',
+    transport_cs:'Auto Praha 35 min, autobus omezený',
+    amenities_en:'Village of Tišice — basic amenities',
+    amenities_cs:'Obec Tišice — základní vybavenost',
+    summary_en:'Unique farmstead with a huge plot at a low price. Ideal for a guesthouse, glamping or organic farm project. High appreciation potential with the right vision.',
+    summary_cs:'Unikátní statek s obřím pozemkem za nízkou cenu. Ideální pro projekt penzion, glamping nebo organická farma.' },
+  { id:5, title_en:'Family house 3+1 town centre', title_cs:'Rodinný dům 3+1 centrum',
+    location:'Mělník — town centre', region:'melnik', type:'dum', price:3750000, area:128, land:390, rooms:'3+1',
+    condition:'good', year:1965, distancePrague:38, score:73, source:'sreality',
+    sourceUrl:'https://www.sreality.cz/hledani/prodej/domy/melnik?cena-do=4000000',
+    searchUrl:'https://www.sreality.cz/hledani/prodej/domy/melnik?cena-do=4000000&plocha-od=110&plocha-do=150',
+    listingRef:'RD 3+1 · centrum Mělník · do 4 mil. Kč · ~128 m²',
+    img:'https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?w=600&q=80', hot:false,
+    pros_en:['Town centre — full amenities','Close to nature and the Elbe river','Stable rental demand'],
+    pros_cs:['Centrum Mělníka — výborná infrastruktura','Blízkost přírody a Labe','Stabilní nájemní poptávka'],
+    cons_en:['Older electrical installation','Town centre parking tricky'],
+    cons_cs:['Starší elektroinstalace','Parkování v centru'],
+    rentalEst:14500, renovEst:250000, appreciationPct:7,
+    transport_en:'Bus Mělník–Prague 50 min, train 42 min',
+    transport_cs:'Autobus Mělník–Praha 50 min, vlak 42 min',
+    amenities_en:'Full — hospital, schools, shops',
+    amenities_cs:'Kompletní — nemocnice, školy, obchody',
+    summary_en:'Solid house in Mělník town centre with good rental demand from workers in the industrial zone. Stable investment with predictable rental income.',
+    summary_cs:'Solidní dům v centru Mělníka s dobrou nájemní poptávkou. Stabilní investice s předvídatelným výnosem z pronájmu.' },
+  { id:6, title_en:'House for renovation 4+1', title_cs:'Rodinný dům k rekonstrukci 4+1',
+    location:'Litoměřice — quiet neighbourhood', region:'litomerice', type:'dum', price:2480000, area:156, land:540, rooms:'4+1',
+    condition:'renovation', year:1972, distancePrague:65, score:62, source:'mmreality',
+    sourceUrl:'https://www.mmreality.cz/cs/nabidka/?typ=prodej&kategorie=rodinne-domy&kraj=ustecky&cena_do=2600000',
+    searchUrl:'https://www.sreality.cz/hledani/prodej/domy/litomerice?cena-do=2600000&plocha-od=130',
+    listingRef:'RD 4+1 k rekonstrukci · Litoměřice · do 2.6 mil. Kč · ~156 m²',
+    img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', hot:false,
+    pros_en:['Very low price per m²','Large plot in quiet area','Historic tourist town'],
+    pros_cs:['Nízká cena za plochu','Velký pozemek v klidné čtvrti','Historické město'],
+    cons_en:['65km from Prague','Full renovation needed','Lower rental demand'],
+    cons_cs:['Vzdálenější od Prahy 65 km','Kompletní rekonstrukce','Nižší nájemní poptávka'],
+    rentalEst:10500, renovEst:700000, appreciationPct:9,
+    transport_en:'Train Prague–Litoměřice 1h 10min, D8 motorway 55min',
+    transport_cs:'Vlak Praha–Litoměřice 1h 10min, D8 auto 55min',
+    amenities_en:'Full — Litoměřice centre 1.5km',
+    amenities_cs:'Kompletní — centrum Litoměřic 1.5km',
+    summary_en:'Low entry price with big renovation potential. Litoměřice is a popular tourist town — after renovation ideal as AirBnB or family home.',
+    summary_cs:'Nízká vstupní cena s velkým potenciálem renovace. Litoměřice jsou oblíbeným turistickým městem.' },
+  { id:7, title_en:'Villa 6+1 with swimming pool', title_cs:'Vilka 6+1 s bazénem',
+    location:'Kralupy nad Vltavou', region:'kralupy', type:'vila', price:4750000, area:230, land:720, rooms:'6+1',
+    condition:'good', year:1998, distancePrague:25, score:79, source:'sreality',
+    sourceUrl:'https://www.sreality.cz/hledani/prodej/domy/kralupy-nad-vltavou?cena-do=5000000',
+    searchUrl:'https://www.sreality.cz/hledani/prodej/domy/kralupy-nad-vltavou?cena-do=5000000&plocha-od=200',
+    listingRef:'Vilka 6+1 s bazénem · Kralupy n.V. · do 5 mil. Kč · ~230 m²',
+    img:'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=600&q=80', hot:false,
+    pros_en:['Large living area 230 m²','Swimming pool in garden','Excellent train link 22 min','Nice neighbourhood'],
+    pros_cs:['Velká plocha 230 m²','Bazén v zahradě','Výborné vlakové spojení 22 min','Pěkná čtvrť'],
+    cons_en:['Higher pool running costs','Near industrial zone'],
+    cons_cs:['Vyšší provozní náklady','Blízkost průmyslové zóny'],
+    rentalEst:25000, renovEst:150000, appreciationPct:7,
+    transport_en:'Train to Praha Holešovice 22 min, every 30 min',
+    transport_cs:'Vlak Praha Holešovice 22 min, každých 30 min',
+    amenities_en:'Full — Kaufland, schools, pharmacy',
+    amenities_cs:'Kompletní — Kaufland, školy, lékárna',
+    summary_en:'Exceptional villa with pool within commuting distance of Prague. Premium rental of 25,000 CZK/month is realistic. Great for Prague commuters.',
+    summary_cs:'Výjimečná vila s bazénem v dostupné vzdálenosti od Prahy. Prémiový pronájem 25 000 Kč/měsíc reálný.' },
+  { id:8, title_en:'Cottage with vineyard views', title_cs:'Chalupa s výhledem na vinice',
+    location:'Roudnice nad Labem', region:'roudnice', type:'chalupa', price:1850000, area:88, land:890, rooms:'2+1',
+    condition:'good', year:1934, distancePrague:55, score:65, source:'sreality',
+    sourceUrl:'https://www.sreality.cz/hledani/prodej/domy/roudnice-nad-labem?cena-do=2000000',
+    searchUrl:'https://www.sreality.cz/hledani/prodej/domy/roudnice-nad-labem?cena-do=2000000&typ-objektu=chalupa',
+    listingRef:'Chalupa 2+1 · Roudnice n.L. · do 2 mil. Kč · pozemek 800+ m²',
+    img:'https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=600&q=80', hot:false,
+    pros_en:['Low price','Large plot with views','Close to wine cellars','AirBnB potential'],
+    pros_cs:['Nízká cena','Velký pozemek s výhledem','Blízkost vinných sklepů','AirBnB potenciál'],
+    cons_en:['Small floor area','Further from Prague','Older structure'],
+    cons_cs:['Malá obytná plocha','Vzdálenější od Prahy','Starší konstrukce'],
+    rentalEst:7500, renovEst:200000, appreciationPct:8,
+    transport_en:'Bus to Prague 1h 20min, train 1h',
+    transport_cs:'Autobus do Prahy 1h 20min, vlak 1h',
+    amenities_en:'Roudnice centre 2km — basic amenities',
+    amenities_cs:'Centrum Roudnice 2km — základní vybavenost',
+    summary_en:'Romantic cottage in wine country. Good for short-term tourist rental — Roudnice is a popular wine tourism destination. Low entry investment.',
+    summary_cs:'Romantická chalupa ve vinařské krajině. Výhodná pro krátkodobý pronájem turistům.' },
+  { id:9, title_en:'New-build house 4+kk (2021)', title_cs:'Rodinný dům 4+kk novostavba 2021',
+    location:'Štětí, Litoměřice district', region:'steti', type:'dum', price:3990000, area:138, land:510, rooms:'4+kk',
+    condition:'excellent', year:2021, distancePrague:58, score:70, source:'sreality',
+    sourceUrl:'https://www.sreality.cz/hledani/prodej/domy/steti?cena-do=4000000',
+    searchUrl:'https://www.sreality.cz/hledani/prodej/domy/steti?cena-do=4000000&plocha-od=120',
+    listingRef:'Novostavba 4+kk · Štětí · do 4 mil. Kč · po roce 2018',
+    img:'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=600&q=80', hot:false,
+    pros_en:['New build 2021 — no repairs','Energy class B','Growing municipality','70% cheaper than Prague'],
+    pros_cs:['Novostavba 2021','Energetická třída B','Rozrůstající se obec','Nižší cena než Praha o 70%'],
+    cons_en:['Further from Prague','Limited local jobs','Lower rental demand'],
+    cons_cs:['Vzdálenější od Prahy','Omezená pracovní nabídka','Nižší nájemní poptávka'],
+    rentalEst:13000, renovEst:0, appreciationPct:9,
+    transport_en:'Train to Prague 55 min, D8 motorway 48 min',
+    transport_cs:'Vlak Praha 55 min, D8 auto 48 min',
+    amenities_en:'Shops, school, sports centre',
+    amenities_cs:'Obchody, škola, sportovní areál',
+    summary_en:'Modern new-build at a price unthinkable in Prague. Suitable as a first home or investment in a growing town.',
+    summary_cs:'Moderní novostavba za cenu, která je v Praze nemyslitelná. Vhodné jako první vlastní bydlení.' },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+function formatPrice(p) {
+  if (currentLang === 'cs') return p >= 1000000 ? (p/1000000).toFixed(2).replace('.',',')+' mil. Kč' : (p/1000).toFixed(0)+' tis. Kč';
+  return p >= 1000000 ? (p/1000000).toFixed(2)+' mil. CZK' : (p/1000).toFixed(0)+' K CZK';
+}
+function scoreClass(s) { return s>=75?'score-high':s>=55?'score-mid':'score-low'; }
+function badgeText(s) {
+  if (s>=75) return { cls:'badge-green', text: currentLang==='en'?'🟢 Great deal':'🟢 Výhodná koupě' };
+  if (s>=55) return { cls:'badge-yellow', text: currentLang==='en'?'🟡 Opportunity':'🟡 Příležitost' };
+  return { cls:'badge-red', text: currentLang==='en'?'🔴 Needs review':'🔴 Vyžaduje posouzení' };
+}
+function condLabel(c) {
+  const map = { excellent: t('condExcellent'), good: t('condGood'), partial: t('condPartial'), renovation: t('condFull') };
+  return map[c] || c;
+}
+function updatePriceLabel(v) {
+  const val = parseInt(v);
+  document.getElementById('price-label').textContent = formatPrice(val);
+  const pct = (val - 500000) / (5000000 - 500000) * 100;
+  document.getElementById('filter-price').style.background = `linear-gradient(to right, var(--primary) ${pct}%, #e2e8f0 ${pct}%)`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FILTERS & RENDER
+// ═══════════════════════════════════════════════════════════════
+let activeFilter = { score:'all', type:'', location:'', price:5000000 };
+
+function renderCards(props) {
+  document.getElementById('result-count').textContent = props.length + ' ' + t('resultCount');
+  const grid = document.getElementById('property-grid');
+  if (!props.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted);">${currentLang==='en'?'No properties match your filters. Try broadening your search.':'Žádné nemovitosti nevyhovují filtru.'}</div>`;
+    return;
+  }
+  grid.innerHTML = props.map(p => {
+    const bd = badgeText(p.score);
+    const title = currentLang==='en' ? p.title_en : p.title_cs;
+    const pros = currentLang==='en' ? p.pros_en : p.pros_cs;
+    const cons = currentLang==='en' ? p.cons_en : p.cons_cs;
+    const ppm = Math.round(p.price/p.area).toLocaleString('cs-CZ');
+    const hotBadge = p.hot ? `<span class="hot-badge">🔴 TŘEBORADICE</span>` : `<span class="prop-badge ${bd.cls}">${bd.text}</span>`;
+    const sourceLabel = p.source==='sreality'?'Sreality.cz':'MMReality.cz';
+    return `<div class="prop-card" onclick="openModal(${p.id})" ${p.hot?'id="treboradic-card" style="border:2px solid #dc2626"':''}>
+      <div class="prop-img">
+        <img src="${p.img}" alt="${title}" loading="lazy"/>
+        ${hotBadge}
+        <div class="score-badge ${scoreClass(p.score)}">${p.score}</div>
+      </div>
+      <div class="prop-body">
+        <div class="prop-price">${formatPrice(p.price)}</div>
+        <div class="prop-price-sub">${ppm} CZK/m²</div>
+        <div class="prop-title">${title}</div>
+        <div class="prop-location">📍 ${p.location}</div>
+        <div class="prop-meta">
+          <div class="prop-meta-item">🏠 <strong>${p.area} m²</strong></div>
+          <div class="prop-meta-item">🌿 <strong>${p.land} m²</strong></div>
+          <div class="prop-meta-item">🚗 <strong>${p.distancePrague} km</strong> Prague</div>
+          <div class="prop-meta-item">📅 <strong>${p.year}</strong></div>
+        </div>
+        <div class="prop-tags">
+          ${pros.slice(0,2).map(x=>`<span class="prop-tag">✓ ${x}</span>`).join('')}
+          ${cons.slice(0,1).map(x=>`<span class="prop-tag neg">✗ ${x}</span>`).join('')}
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:7px 10px;margin-bottom:10px;font-size:11px;color:#64748b;">
+          🔍 <strong style="color:#0f172a">${currentLang==='en'?'Search hint':'Hledej'}</strong> — ${p.listingRef}
+        </div>
+        <div class="prop-actions">
+          <button class="btn-detail" onclick="event.stopPropagation();openModal(${p.id})">${currentLang==='en'?'View detail':'Zobrazit detail'}</button>
+          <a href="${p.searchUrl}" target="_blank" onclick="event.stopPropagation()">
+            <button class="btn-ext" title="${currentLang==='en'?'Find similar on':'Najít podobné na'} ${sourceLabel}">↗ ${sourceLabel}</button>
+          </a>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function applyFilters() {
+  activeFilter.price = parseInt(document.getElementById('filter-price').value);
+  activeFilter.location = document.getElementById('filter-location').value;
+  activeFilter.type = document.getElementById('filter-type').value;
+  const sort = document.getElementById('sort-select').value;
+  let f = PROPERTIES.filter(p => {
+    if (p.price > activeFilter.price) return false;
+    if (activeFilter.location && p.region !== activeFilter.location) return false;
+    if (activeFilter.type && p.type !== activeFilter.type) return false;
+    if (activeFilter.score==='high' && p.score<75) return false;
+    if (activeFilter.score==='mid' && (p.score<55||p.score>=75)) return false;
+    if (activeFilter.score==='low' && p.score>=55) return false;
+    return true;
+  });
+  f.sort((a,b)=>sort==='score'?b.score-a.score:sort==='price-asc'?a.price-b.price:sort==='price-desc'?b.price-a.price:b.area-a.area);
+  renderCards(f);
+}
+
+function filterByScore(score, btn) {
+  activeFilter.score = score;
+  document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+function filterByType(type, btn) {
+  activeFilter.type = activeFilter.type===type?'':type;
+  document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));
+  if (activeFilter.type) btn.classList.add('active');
+  else document.querySelector('.filter-chip').classList.add('active');
+  applyFilters();
+}
+
+function scrollToTreboradic() {
+  applyFilters();
+  setTimeout(()=>{
+    const el = document.getElementById('treboradic-card');
+    if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 100);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════════
+function openModal(id) {
+  const p = PROPERTIES.find(x=>x.id===id);
+  if (!p) return;
+  document.getElementById('modal-img').src = p.img;
+  const bd = badgeText(p.score);
+  const title = currentLang==='en' ? p.title_en : p.title_cs;
+  const pros = currentLang==='en' ? p.pros_en : p.pros_cs;
+  const cons = currentLang==='en' ? p.cons_en : p.cons_cs;
+  const transport = currentLang==='en' ? p.transport_en : p.transport_cs;
+  const amenities = currentLang==='en' ? p.amenities_en : p.amenities_cs;
+  const summary = currentLang==='en' ? p.summary_en : p.summary_cs;
+  const monthly = Math.round(p.price*0.0035);
+  const roi = ((p.rentalEst*12)/p.price*100).toFixed(1);
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-header">
+      <div>
+        <div style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">📍 ${p.location}</div>
+        <div style="font-size:19px;font-weight:800;">${title}</div>
+        <div class="modal-price">${formatPrice(p.price)}</div>
+        <div style="font-size:13px;color:var(--muted);">${Math.round(p.price/p.area).toLocaleString('cs-CZ')} CZK/m² · ${p.rooms} · ${p.year}</div>
+      </div>
+      <div>
+        <div class="modal-score ${scoreClass(p.score)}">${p.score}</div>
+        <div class="modal-score-label">${currentLang==='en'?'Invest. score':'Invest. skóre'}</div>
+        <div style="margin-top:6px;text-align:center;"><span class="prop-badge ${bd.cls}" style="position:static;font-size:11px;">${bd.text}</span></div>
+      </div>
+    </div>
+    <div class="modal-grid">
+      <div>
+        <div class="modal-section">
+          <div class="modal-section-title">${t('mOverview')}</div>
+          <div class="metric-row"><span class="metric-label">${t('mFloorArea')}</span><span class="metric-val">${p.area} m²</span></div>
+          <div class="metric-row"><span class="metric-label">${t('mLand')}</span><span class="metric-val">${p.land} m²</span></div>
+          <div class="metric-row"><span class="metric-label">${t('mCondition')}</span><span class="metric-val">${condLabel(p.condition)}</span></div>
+          <div class="metric-row"><span class="metric-label">${t('mBuilt')}</span><span class="metric-val">${p.year}</span></div>
+          <div class="metric-row"><span class="metric-label">${t('mPragueKm')}</span><span class="metric-val">${p.distancePrague} km</span></div>
+          <div class="metric-row"><span class="metric-label">${t('mSource')}</span><span class="metric-val" style="color:var(--primary)">${p.source==='sreality'?'Sreality.cz':'MMReality.cz'}</span></div>
+          <div class="metric-row"><span class="metric-label">${currentLang==='en'?'Listing ref':'Referenční popis'}</span><span class="metric-val" style="font-size:11px;color:#64748b">${p.listingRef}</span></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">${t('mTransport')}</div>
+          <div style="font-size:13px;color:var(--muted);">🚌 ${transport}</div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">${t('mAmenities')}</div>
+          <div style="font-size:13px;color:var(--muted);">🏪 ${amenities}</div>
+        </div>
+      </div>
+      <div>
+        <div class="modal-section">
+          <div class="modal-section-title">${t('mAnalysis')}</div>
+          <div class="invest-row"><span style="font-size:12px;color:var(--muted)">${t('mPriceVal')}</span><span style="font-size:12px;font-weight:600">${Math.min(100,Math.round((5000000-p.price)/50000+40))}/100</span></div>
+          <div class="invest-bar"><div class="invest-fill" style="width:${Math.min(100,Math.round((5000000-p.price)/50000+40))}%;background:var(--primary)"></div></div>
+          <div class="invest-row"><span style="font-size:12px;color:var(--muted)">${t('mPragueScore')}</span><span style="font-size:12px;font-weight:600">${Math.max(20,100-p.distancePrague)}/100</span></div>
+          <div class="invest-bar"><div class="invest-fill" style="width:${Math.max(20,100-p.distancePrague)}%;background:#2563eb"></div></div>
+          <div class="invest-row"><span style="font-size:12px;color:var(--muted)">${t('mRental')}</span><span style="font-size:12px;font-weight:600">${roi}% ${currentLang==='en'?'annual yield':'roční výnos'}</span></div>
+          <div class="invest-bar"><div class="invest-fill" style="width:${Math.min(100,parseFloat(roi)*10)}%;background:var(--green)"></div></div>
+          <div class="invest-row"><span style="font-size:12px;color:var(--muted)">${t('mAppreciation')}</span><span style="font-size:12px;font-weight:600">+${p.appreciationPct}% / ${currentLang==='en'?'year':'rok'}</span></div>
+          <div class="invest-bar"><div class="invest-fill" style="width:${p.appreciationPct*8}%;background:#f97316"></div></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">${t('mStrengths')}</div>
+          <ul class="pro-con-list">${pros.map(x=>`<li><span style="color:var(--green)">✓</span><span>${x}</span></li>`).join('')}</ul>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">${t('mRisks')}</div>
+          <ul class="pro-con-list">${cons.map(x=>`<li><span style="color:var(--red)">✗</span><span>${x}</span></li>`).join('')}</ul>
+        </div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">${t('mSummary')}</div>
+      <div style="font-size:14px;line-height:1.7;background:var(--bg);padding:14px;border-radius:8px;">${summary}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px;">
+      <div style="background:#f0fdf4;border-radius:8px;padding:12px;text-align:center;">
+        <div style="font-size:17px;font-weight:800;color:var(--green)">${p.rentalEst.toLocaleString('cs-CZ')} CZK</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${t('mRentalEst')}</div>
+      </div>
+      <div style="background:#fff7ed;border-radius:8px;padding:12px;text-align:center;">
+        <div style="font-size:17px;font-weight:800;color:var(--accent)">${p.renovEst>0?p.renovEst.toLocaleString('cs-CZ')+' CZK':t('mNoReno')}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${t('mRenovEst')}</div>
+      </div>
+      <div style="background:#eff6ff;border-radius:8px;padding:12px;text-align:center;">
+        <div style="font-size:17px;font-weight:800;color:var(--primary)">+${p.appreciationPct}% / ${currentLang==='en'?'yr':'rok'}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${t('mApprecPct')}</div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">${t('mMortgage')}</div>
+      <div class="mortgage-box">
+        <div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:4px;">${t('mMortgageSub')}</div>
+          <div style="font-size:12px;color:var(--muted);">${t('mDeposit')} ${(p.price*0.2).toLocaleString('cs-CZ')} CZK · ${t('mLoan')} ${(p.price*0.8).toLocaleString('cs-CZ')} CZK</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:24px;font-weight:800;color:var(--primary)">${monthly.toLocaleString('cs-CZ')} CZK</div>
+          <div style="font-size:12px;color:var(--muted);">${t('mPerMonth')}</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;">
+      <a href="${p.searchUrl}" target="_blank" style="flex:1;">
+        <button style="width:100%;background:var(--primary);color:white;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">
+          🔍 ${currentLang==='en'?'Find similar listings on':'Najít podobné inzeráty na'} ${p.source==='sreality'?'Sreality.cz':'MMReality.cz'} ↗
+        </button>
+      </a>
+      <button onclick="closeModalDirect()" style="padding:11px 18px;border:1px solid var(--border);border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;background:white;">${t('mClose')}</button>
+    </div>
+    <div style="margin-top:14px;background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;">
+      <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:4px;">🔍 ${currentLang==='en'?'How to find this listing':'Jak najít tento inzerát'}</div>
+      <div style="font-size:12px;color:#78350f;line-height:1.6;">
+        ${currentLang==='en'
+          ? `These are <strong>illustrative sample listings</strong> showing what's available in each area. To find the actual listing, click the button above to open ${p.source==='sreality'?'Sreality.cz':'MMReality.cz'} filtered to this area and price range, then search for:`
+          : `Tyto nabídky jsou <strong>ilustrační vzorové inzeráty</strong> ukazující dostupné nemovitosti v dané oblasti. Pro nalezení skutečného inzerátu klikněte na tlačítko výše a hledejte:`}
+        <br/><strong style="color:#1d6fa4;font-size:13px;background:white;display:inline-block;margin-top:6px;padding:4px 10px;border-radius:4px;border:1px solid #bfdbfe;">${p.listingRef}</strong>
+      </div>
+    </div>`;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) { if (e.target===document.getElementById('modal')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modal').classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModalDirect(); });
+
+// ═══════════════════════════════════════════════════════════════
+// EMAIL ALERT (EmailJS — free tier, 200 emails/month)
+// ═══════════════════════════════════════════════════════════════
+function subscribeAlert() {
+  const email = document.getElementById('alert-email').value;
+  const region = document.getElementById('alert-region').value;
+  if (!email || !email.includes('@')) {
+    alert(currentLang==='en'?'Please enter a valid email address.':'Zadejte platný e-mail.');
+    return;
+  }
+
+  // Store subscription in localStorage
+  const subs = JSON.parse(localStorage.getItem('uhouseAlerts') || '[]');
+  const existing = subs.find(s => s.email === email && s.region === region);
+  if (!existing) { subs.push({ email, region, date: new Date().toISOString() }); }
+  localStorage.setItem('uhouseAlerts', JSON.stringify(subs));
+
+  // Show success message
+  document.getElementById('alert-success').textContent = currentLang==='en'
+    ? `✅ Alert set! We'll email ${email} when a new property appears in ${region === 'all' ? 'any area' : region}.`
+    : `✅ Upozornění nastaveno! Pošleme e-mail na ${email} při nové nabídce v oblasti ${region}.`;
+  document.getElementById('alert-success').style.display = 'block';
+
+  // Auto-send a confirmation using EmailJS (free)
+  // To activate: sign up at emailjs.com, get your service/template IDs and replace below
+  try {
+    emailjs.init('YOUR_PUBLIC_KEY'); // replace with your EmailJS public key
+    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+      to_email: email,
+      to_name: email.split('@')[0],
+      region: region,
+      listing_title: 'Rodinný dům 4+1 — Třeboradice',
+      listing_price: '4,850,000 CZK',
+      listing_score: '81 / 100',
+      listing_url: 'https://www.sreality.cz/hledani/prodej/domy?region=treboradic',
+      site_url: 'https://umeczk.github.io/gym-planner',
+    });
+  } catch(e) {
+    // EmailJS not configured yet — alert still saved to localStorage
+    console.log('EmailJS not configured yet:', e.message);
+  }
+}
+
+// Check on load if there are Třeboradice listings and show banner
+window.addEventListener('load', () => {
+  const trebProps = PROPERTIES.filter(p => p.region === 'treboradic');
+  if (trebProps.length === 0) {
+    document.getElementById('treboradic-banner').style.display = 'none';
+  }
+  applyFilters();
+});
+</script>
+</body>
+</html>

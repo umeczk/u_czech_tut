@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Czech DLI — Complete Course Library</title>
+<style>
+:root {
+  --bg: #f5f4f0;
+  --surface: #fff;
+  --border: #e0dbd0;
+  --accent: #2a5f8a;
+  --accent2: #1d4166;
+  --active-bg: #eaf2f9;
+  --czech-bg: #fafaf7;
+  --text: #1a1a1a;
+  --muted: #666;
+  --shadow: 0 1px 4px rgba(0,0,0,0.08);
+  --sidebar-w: 280px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Header */
+header { background: var(--accent2); color: #fff; padding: 11px 20px; flex-shrink: 0; display: flex; align-items: center; gap: 16px; }
+header h1 { font-size: 1rem; font-weight: 700; }
+header .subtitle { font-size: 0.75rem; opacity: 0.7; }
+.progress-bar { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 0.72rem; opacity: 0.85; }
+.progress-track { width: 100px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: #7fd; border-radius: 3px; transition: width 0.3s; }
+
+/* Layout */
+.layout { display: flex; flex: 1; overflow: hidden; }
+
+/* Sidebar */
+.sidebar { width: var(--sidebar-w); flex-shrink: 0; border-right: 1px solid var(--border); overflow-y: auto; background: var(--surface); }
+
+/* Course sections in sidebar */
+.course-section { border-bottom: 2px solid var(--border); }
+.course-hdr { padding: 9px 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 700; color: #fff; user-select: none; }
+.course-hdr:hover { filter: brightness(1.1); }
+.course-hdr .arrow { margin-left: auto; font-size: 0.7rem; transition: transform 0.2s; }
+.course-section.open .course-hdr .arrow { transform: rotate(90deg); }
+.course-body { display: none; }
+.course-section.open .course-body { display: block; }
+
+/* Unit groups within a course */
+.unit-group { border-bottom: 1px solid var(--border); }
+.unit-group-hdr { padding: 6px 14px 6px 20px; cursor: pointer; font-size: 0.73rem; font-weight: 600; color: var(--muted); background: #f9f8f5; display: flex; align-items: center; justify-content: space-between; }
+.unit-group-hdr:hover { background: var(--active-bg); }
+.unit-group-body { display: none; }
+.unit-group.open .unit-group-body { display: block; }
+
+/* Lesson rows */
+.lesson-row { padding: 7px 14px 7px 26px; cursor: pointer; font-size: 0.78rem; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #f0ece4; }
+.lesson-row:hover { background: var(--active-bg); }
+.lesson-row.active { background: var(--active-bg); border-left: 3px solid var(--accent); padding-left: 23px; }
+.lesson-row .lr-done { color: #3d8c4a; font-size: 0.65rem; margin-left: auto; display: none; }
+.lesson-row.done .lr-done { display: block; }
+.lesson-row .lr-title { flex: 1; }
+.lesson-row .lr-tape { font-size: 0.67rem; color: var(--muted); }
+
+/* Main content */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Lesson header */
+.lesson-bar { padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; box-shadow: var(--shadow); min-height: 46px; }
+.lesson-bar h2 { font-size: 0.92rem; font-weight: 700; }
+.tag { font-size: 0.68rem; background: var(--active-bg); border: 1px solid #c5d8ec; color: var(--accent); padding: 2px 7px; border-radius: 10px; font-weight: 600; white-space: nowrap; }
+.btn-done { margin-left: auto; padding: 4px 12px; border: 1px solid #3d8c4a; color: #3d8c4a; background: none; border-radius: 5px; font-size: 0.73rem; cursor: pointer; font-weight: 600; flex-shrink: 0; }
+.btn-done:hover, .btn-done.is-done { background: #3d8c4a; color: #fff; }
+
+/* Audio strip */
+.audio-strip { padding: 8px 20px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; gap: 12px; }
+.audio-strip audio { flex: 1; height: 30px; }
+.audio-label { font-size: 0.7rem; color: var(--muted); white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+
+/* Content scroll */
+.content-scroll { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+
+/* Welcome */
+.welcome { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
+.welcome-inner { text-align: center; max-width: 460px; color: var(--muted); line-height: 1.7; }
+.welcome-inner h3 { font-size: 1.05rem; color: var(--text); margin-bottom: 12px; }
+.course-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; text-align: left; }
+.course-card-sm { border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; font-size: 0.78rem; }
+.course-card-sm strong { display: block; font-size: 0.82rem; margin-bottom: 3px; }
+
+/* Cards */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; overflow: hidden; box-shadow: var(--shadow); }
+.card-hdr { padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); background: var(--active-bg); }
+.card-body { padding: 12px 14px; }
+
+/* Dialogue table */
+.dialogue { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+.dialogue tr { border-bottom: 1px solid #f0ece4; }
+.dialogue tr:last-child { border-bottom: none; }
+.dialogue td { padding: 6px 8px; vertical-align: top; line-height: 1.5; }
+.dialogue td.num { width: 24px; color: var(--muted); font-weight: 700; font-size: 0.68rem; padding-top: 8px; text-align: right; }
+.dialogue td.czech { font-weight: 500; background: var(--czech-bg); width: 46%; }
+.dialogue td.en { color: #444; }
+.dialogue tr:hover td { background: var(--active-bg); }
+
+/* Vocab table */
+.vocab { width: 100%; border-collapse: collapse; font-size: 0.81rem; }
+.vocab tr { border-bottom: 1px solid #f0ece4; }
+.vocab tr:last-child { border-bottom: none; }
+.vocab td { padding: 5px 8px; }
+.vocab td:first-child { font-weight: 600; width: 40%; }
+.vocab td.note { width: 15%; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+.vocab td.en { color: #444; }
+
+/* Grammar */
+.grammar-text { font-size: 0.81rem; line-height: 1.7; color: #333; }
+.grammar-text p { margin-bottom: 8px; }
+.grammar-text p:last-child { margin-bottom: 0; }
+.grammar-text code { background: var(--active-bg); padding: 1px 5px; border-radius: 3px; font-family: monospace; font-size: 0.88em; color: var(--accent2); }
+
+/* Drills */
+.drills { list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 0.81rem; }
+.drills li { background: var(--czech-bg); border: 1px solid var(--border); border-radius: 5px; padding: 7px 12px; line-height: 1.5; }
+.drills li .dp { font-weight: 600; color: var(--text); }
+.drills li .da { color: #555; margin-top: 2px; }
+
+/* Reference chip */
+.ref-chip { display: inline-flex; align-items: center; gap: 6px; background: #fffbf0; border: 1px solid #e8d9a0; border-radius: 5px; padding: 6px 12px; font-size: 0.75rem; color: #6b5a00; }
+.ref-chip a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.ref-chip a:hover { text-decoration: underline; }
+.refs-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* PDF links grid */
+.pdf-links { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0; }
+.pdf-link { font-size: 0.75rem; padding: 4px 10px; border: 1px solid var(--border); border-radius: 4px; color: var(--accent); text-decoration: none; background: var(--surface); }
+.pdf-link:hover { background: var(--active-bg); }
+
+/* Loading state */
+.loading { padding: 30px; text-align: center; color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Czech DLI — Complete Course Library</h1>
+    <div class="subtitle">Defense Language Institute · 5 Courses · Complete Beginner → Advanced</div>
+  </div>
+  <div class="progress-bar">
+    <span id="progressText">0 / 0 done</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="loading">Building course index…</div>
+  </nav>
+  <div class="main">
+    <div class="lesson-bar" id="lessonBar">
+      <h2 id="lessonTitle" style="color:var(--muted);font-weight:400;font-size:0.85rem">Select a lesson from the left</h2>
+    </div>
+    <div class="audio-strip" id="audioStrip" style="display:none">
+      <span class="audio-label" id="audioLabel"></span>
+      <audio id="audioPlayer" controls></audio>
+    </div>
+    <div id="contentArea">
+      <div class="welcome">
+        <div class="welcome-inner">
+          <h3>DLI Czech — Complete Course Library</h3>
+          <p>All audio tapes and text content from your Defense Language Institute Czech materials, organized by course. Select any lesson from the sidebar to begin.</p>
+          <div class="course-grid" id="courseGrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── All course data (populated below) ────────────────────────────────────
+const BASE = "/Users/I779156/Desktop/czech";
+const DONE_KEY = "czDoneUnits_v2";
+const doneUnits = new Set(JSON.parse(localStorage.getItem(DONE_KEY) || "[]"));
+
+// ─── Helpers ───────────────────────────────────────────────────────────────
+function mkCard(title) {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `<div class="card-hdr">${title}</div><div class="card-body"></div>`;
+  return card;
+}
+
+function renderSection(sec, scroll) {
+  if (sec.type === "intro") {
+    const c = mkCard("Overview");
+    c.querySelector(".card-body").innerHTML = `<div class="grammar-text"><p>${sec.text}</p></div>`;
+    scroll.appendChild(c);
+  } else if (sec.type === "dialogue") {
+    const c = mkCard(sec.title || "Dialogue");
+    const t = document.createElement("table"); t.className = "dialogue";
+    (sec.rows || []).forEach(([num, czech, en]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td class="num">${num}</td><td class="czech">${czech}</td><td class="en">${en}</td>`;
+      t.appendChild(tr);
+    });
+    c.querySelector(".card-body").appendChild(t);
+    scroll.appendChild(c);
+  } else if (sec.type === "vocab") {
+    const c = mkCard(sec.title || "Vocabulary");
+    const t = document.createElement("table"); t.className = "vocab";
+    (sec.rows || []).forEach(([cz, note, en]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${cz}</td><td class="note">${note || ""}</td><td class="en">${en}</td>`;
+      t.appendChild(tr);
+    });
+    c.querySelector(".card-body").appendChild(t);
+    scroll.appendChild(c);
+  } else if (sec.type === "grammar") {
+    const c = mkCard(sec.title || "Grammar Note");
+    const d = document.createElement("div"); d.className = "grammar-text"; d.innerHTML = sec.html;
+    c.querySelector(".card-body").appendChild(d);
+    scroll.appendChild(c);
+  } else if (sec.type === "drills") {
+    const c = mkCard(sec.title || "Pattern Drills");
+    const ul = document.createElement("ul"); ul.className = "drills";
+    (sec.items || []).forEach(item => {
+      const li = document.createElement("li");
+      li.innerHTML = `<div class="dp">${item.prompt}</div><div class="da">→ ${item.answer}</div>`;
+      ul.appendChild(li);
+    });
+    c.querySelector(".card-body").appendChild(ul);
+    scroll.appendChild(c);
+  } else if (sec.type === "pdfs") {
+    const c = mkCard("Reference PDFs");
+    const div = document.createElement("div"); div.className = "pdf-links";
+    (sec.files || []).forEach(f => {
+      const a = document.createElement("a");
+      a.className = "pdf-link"; a.href = "file://" + f.path;
+      a.target = "_blank"; a.textContent = f.label + (f.pages ? " · " + f.pages : "");
+      div.appendChild(a);
+    });
+    c.querySelector(".card-body").appendChild(div);
+    scroll.appendChild(c);
+  }
+}
+
+// ─── Load a lesson ─────────────────────────────────────────────────────────
+function loadUnit(unit, rowEl) {
+  document.querySelectorAll(".lesson-row.active").forEach(x => x.classList.remove("active"));
+  rowEl.classList.add("active");
+
+  // Header
+  const bar = document.getElementById("lessonBar");
+  document.getElementById("lessonTitle").textContent = unit.title;
+  document.getElementById("lessonTitle").style.cssText = "";
+  bar.querySelectorAll(".tag,.btn-done").forEach(x => x.remove());
+  if (unit.tag) {
+    const t = document.createElement("span"); t.className = "tag"; t.textContent = unit.tag;
+    bar.appendChild(t);
+  }
+  const btn = document.createElement("button");
+  btn.className = "btn-done" + (doneUnits.has(unit.id) ? " is-done" : "");
+  btn.textContent = doneUnits.has(unit.id) ? "✓ Done" : "Mark done";
+  btn.onclick = () => {
+    if (doneUnits.has(unit.id)) { doneUnits.delete(unit.id); btn.textContent = "Mark done"; btn.classList.remove("is-done"); rowEl.classList.remove("done"); }
+    else { doneUnits.add(unit.id); btn.textContent = "✓ Done"; btn.classList.add("is-done"); rowEl.classList.add("done"); }
+    localStorage.setItem(DONE_KEY, JSON.stringify([...doneUnits]));
+    updateProgress();
+  };
+  bar.appendChild(btn);
+
+  // Audio
+  const strip = document.getElementById("audioStrip");
+  strip.style.display = "flex";
+  document.getElementById("audioLabel").textContent = unit.audioLabel || unit.title;
+  const player = document.getElementById("audioPlayer");
+  player.src = "file://" + unit.audio;
+  player.load();
+
+  // Content
+  const area = document.getElementById("contentArea");
+  area.innerHTML = "";
+  const scroll = document.createElement("div"); scroll.className = "content-scroll";
+  (unit.sections || []).forEach(sec => renderSection(sec, scroll));
+  area.appendChild(scroll);
+}
+
+// ─── Build sidebar from COURSES data ──────────────────────────────────────
+function buildSidebar(courses) {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.innerHTML = "";
+  let totalUnits = 0;
+
+  courses.forEach(course => {
+    totalUnits += course.units.length;
+    const section = document.createElement("div");
+    section.className = "course-section" + (course.defaultOpen ? " open" : "");
+
+    const hdr = document.createElement("div");
+    hdr.className = "course-hdr";
+    hdr.style.background = course.color;
+    hdr.innerHTML = `<span>${course.title}</span><span style="font-size:0.68rem;opacity:0.7;margin-left:4px">(${course.units.length})</span><span class="arrow">▶</span>`;
+    hdr.onclick = () => section.classList.toggle("open");
+
+    const body = document.createElement("div");
+    body.className = "course-body";
+
+    // Group units if the course has groups, else flat list
+    if (course.groups) {
+      course.groups.forEach(group => {
+        const grpEl = document.createElement("div"); grpEl.className = "unit-group" + (group.defaultOpen ? " open" : "");
+        const grpHdr = document.createElement("div"); grpHdr.className = "unit-group-hdr";
+        const grpUnits = course.units.filter(u => u.group === group.id);
+        grpHdr.innerHTML = `<span>${group.label}</span><span style="font-size:0.68rem">${grpUnits.length} tapes</span>`;
+        grpHdr.onclick = () => grpEl.classList.toggle("open");
+        const grpBody = document.createElement("div"); grpBody.className = "unit-group-body";
+        grpUnits.forEach(unit => grpBody.appendChild(makeLessonRow(unit)));
+        grpEl.appendChild(grpHdr); grpEl.appendChild(grpBody);
+        body.appendChild(grpEl);
+      });
+    } else {
+      course.units.forEach(unit => body.appendChild(makeLessonRow(unit)));
+    }
+
+    section.appendChild(hdr); section.appendChild(body);
+    sidebar.appendChild(section);
+  });
+
+  // Welcome course grid
+  const grid = document.getElementById("courseGrid");
+  grid.innerHTML = "";
+  courses.forEach(c => {
+    const el = document.createElement("div"); el.className = "course-card-sm";
+    el.style.borderLeftColor = c.color; el.style.borderLeftWidth = "3px";
+    el.innerHTML = `<strong>${c.title}</strong>${c.description}`;
+    grid.appendChild(el);
+  });
+
+  updateProgress(totalUnits);
+}
+
+function makeLessonRow(unit) {
+  const row = document.createElement("div");
+  row.className = "lesson-row" + (doneUnits.has(unit.id) ? " done" : "");
+  row.dataset.unitId = unit.id;
+  row.innerHTML = `<div class="lr-title">${unit.title}</div><span class="lr-done">✓</span>`;
+  if (unit.tapeLabel) {
+    const tape = document.createElement("div"); tape.className = "lr-tape"; tape.textContent = unit.tapeLabel;
+    row.insertBefore(tape, row.querySelector(".lr-done"));
+  }
+  row.onclick = () => loadUnit(unit, row);
+  return row;
+}
+
+let _totalUnits = 0;
+function updateProgress(total) {
+  if (total) _totalUnits = total;
+  const done = doneUnits.size;
+  const pct = _totalUnits ? Math.round(done / _totalUnits * 100) : 0;
+  document.getElementById("progressText").textContent = `${done} / ${_totalUnits} done`;
+  document.getElementById("progressFill").style.width = pct + "%";
+}
+
+// ─── COURSE DATA ───────────────────────────────────────────────────────────
+// Defined below — loaded after DOM ready
+window.addEventListener("DOMContentLoaded", () => buildSidebar(COURSES));
+</script>
+
+<!-- ═══ COURSE DATA ═══════════════════════════════════════════════════════ -->
+<script>
+const B = BASE; // shorthand
+
+const COURSES = [
+
+// ────────────────────────────────────────────────────────────────────────────
+// 1. CZECH BASIC COURSE
+// ────────────────────────────────────────────────────────────────────────────
+{
+  id: "basic",
+  title: "Czech Basic Course",
+  description: "Complete beginner course. Lessons 1–150, 26 dialog tapes + 12 drill tapes.",
+  color: "#1d4166",
+  defaultOpen: true,
+  groups: [
+    { id: "basic-dialog", label: "Dialogue Tapes (Vol 1–7)", defaultOpen: true },
+    { id: "basic-drill",  label: "Drill Tapes (Numbers, Geography, Weather)" },
+  ],
+  units: [
+
+  // ── DIALOGUE TAPES ───────────────────────────────────────────────────────
+  {
+    id: "b-d01", group: "basic-dialog",
+    title: "Lessons 1–3: What is it?",
+    tapeLabel: "Tape 01",
+    tag: "Vol 1 · Lessons 1–3",
+    audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 01 Vol 01 Less 01-03 .mp3`,
+    audioLabel: "Tape 01 — Lessons 1–3 (Dialogues)",
+    sections: [
+      { type: "intro", text: "<strong>Focus:</strong> Pronunciation of short vowels, unaspirated stops (p, t, k), basic intonation. Czech stress always falls on the <em>first syllable</em>. No articles in Czech." },
+      { type: "dialogue", title: "Dialogue — Co je to? (What is this?)", rows: [
+        ["1","Co je to?","What is this?"],
+        ["","To je mapa.","This is a map."],
+        ["2","A co je to?","And what is that?"],
+        ["","To je okno.","That is a window."],
+        ["3","Kdo je to?","Who is that?"],
+        ["","To je student.","He is a student."],
+        ["4","A kdo je to?","And who is that?"],
+        ["","To je letec.","That's an airman."],
+        ["5","Je to tužka?","Is this a pencil?"],
+        ["","Ano, to je tužka.","Yes, it's a pencil."],
+        ["6","Co je tady?","What's here?"],
+        ["","Tady je židle.","Here is a chair."],
+        ["7","A co je tam?","And what's there?"],
+        ["","Tam je koš.","There is a basket."],
+        ["8","Je tady tabule?","Is there a blackboard here?"],
+        ["","Ano, tady je tabule.","Yes, there is a blackboard here."],
+        ["9","Kde je pošta?","Where is the post office?"],
+        ["","Pošta je tam.","The post office is over there."],
+      ]},
+      { type: "vocab", title: "Vocabulary", rows: [
+        ["co","","what"],["kdo","","who"],["to","","this / that / it"],
+        ["tady","","here"],["tam","","there"],["kde","","where"],
+        ["je","","is (3rd sg.)"],["ano","","yes"],
+        ["mapa","f.","map"],["okno","n.","window"],["student","m.","student"],
+        ["letec","m.","airman"],["tužka","f.","pencil"],["židle","f.","chair"],
+        ["koš","m.","basket"],["tabule","f.","blackboard"],["pošta","f.","post office"],
+        ["pan","m.","Mr. / sir (proclitic — unstressed)"],
+      ]},
+      { type: "grammar", title: "Grammar: Word Order & Copula", html: `<p>Questions are formed by intonation alone: <code>To je mapa?</code> (rising pitch) = "Is this a map?"</p><p><strong>No articles:</strong> <em>letec</em> = "an airman" or "the airman" — context tells you which.</p><p>Word stress falls on the <strong>first syllable</strong> always: <code>MA-pa</code>, <code>TAM</code>, <code>TA-dy</code>.</p>` },
+      { type: "drills", title: "Pattern Drills", items: [
+        { prompt: "Co je tady?", answer: "Tady je mapa. / Tady je tužka. / Tady je tabule." },
+        { prompt: "Kdo je tady?", answer: "Tady je student. / Tady je letec." },
+        { prompt: "Je pan Svoboda student?", answer: "Ano, pan Svoboda je student." },
+      ]},
+      { type: "pdfs", files: [
+        { label: "Pronunciation Dialogues", pages: "pp. 1–16", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
+        { label: "Grammar Exercises Vol 1", pages: "Less 1–3", path: `${B}/t/Czech Basic Course/Vol 01 Part 01 Less 01-19 Grammar Practice Exercises.pdf` },
+      ]},
+    ]
+  },
+
+  {
+    id: "b-d02", group: "basic-dialog",
+    title: "Lessons 4–5: Here Is a Letter",
+    tapeLabel: "Tape 02",
+    tag: "Vol 1 · Lessons 4–5",
+    audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 02 Vol 01 Less 04-05.mp3`,
+    audioLabel: "Tape 02 — Lessons 4–5",
+    sections: [
+      { type: "intro", text: "<strong>Focus:</strong> New environment vocabulary (home, outside, distance, weather). Contrast word <em>ale</em> (but). Cluster /sj/." },
+      { type: "dialogue", title: "Dialogue — Tady je dopis.", rows: [
+        ["","Tady je dopis.","Here is a letter."],
+        ["1","Je tady dopis?","Is the letter here?"],
+        ["","Ano, tady je dopis.","Yes, the letter is here."],
+        ["2","Co je to?","What is this?"],
+        ["","To je pivo a to je kakao.","This is a beer and this is a cocoa."],
+        ["3","Kde je teta?","Where is (your) aunt?"],
+        ["","Teta je doma. Pes je taky doma.","Aunt is at home. The dog is also at home."],
+        ["4","Kde je kolo?","Where is the bike?"],
+        ["","Kolo je venku.","The bike is outside."],
+        ["5","Co je to tam?","What is that there?"],
+        ["","To je tank. Taky je tam letadlo.","It is a tank. There is also an airplane there."],
+        ["6","Je kino daleko?","Is the movie theater far?"],
+        ["","Ano, kino je moc daleko.","Yes, the movie theater is quite far."],
+        ["7","Jak je venku?","How is it outside?"],
+        ["","Venku je zima. Ale tady je moc teplo.","It's cold outside. But here it is very warm."],
+      ]},
+      { type: "vocab", title: "Vocabulary", rows: [
+        ["dopis","m.","letter"],["pivo","n.","beer"],["kakao","n.","cocoa"],
+        ["teta","f.","aunt"],["doma","","at home"],["taky","","also, too"],
+        ["pes","m.","dog"],["kolo","n.","bike / wheel"],["venku","","outside"],
+        ["tank","m.","tank"],["letadlo","n.","airplane"],["kino","n.","movie theater"],
+        ["daleko","","far"],["moc","","very / too much"],["jak","","how"],
+        ["zima","","cold (weather)"],["teplo","","warm (weather)"],["ale","","but"],
+      ]},
+      { type: "grammar", title: "Grammar: taky & ale", html: `<p><code>taky</code> (also) is flexible in position: <em>Pes je taky doma</em> or <em>Taky pes je doma</em>.</p><p><code>ale</code> (but) connects contrasting clauses: <em>Venku je zima, ale tady je teplo.</em></p><p><strong>Jak je...?</strong> — "How is it...?" is used for weather and conditions.</p>` },
+      { type: "drills", title: "Pattern Drills", items: [
+        { prompt: "Venku je tank.", answer: "Venku je letadlo. / Venku je pes. / Venku je kolo." },
+        { prompt: "Je kino daleko?", answer: "Ano, kino je moc daleko." },
+        { prompt: "Jak je venku?", answer: "Venku je zima. / Venku je teplo." },
+      ]},
+      { type: "pdfs", files: [
+        { label: "Pronunciation Dialogues", pages: "pp. 17–28", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
+      ]},
+    ]
+  },
+
+  {
+    id: "b-d03", group: "basic-dialog",
+    title: "Lessons 6–7: The Paper Is Good",
+    tapeLabel: "Tape 03",
+    tag: "Vol 1 · Lessons 6–7",
+    audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 03 Vol 01 Less 06-07.mp3`,
+    audioLabel: "Tape 03 — Lessons 6–7",
+    sections: [
+      { type: "intro", text: "<strong>Focus:</strong> Long vowels (á, é, í, ó, ú/ů) — these change meaning! Grammatical gender (m./f./n.) and adjective agreement." },
+      { type: "dialogue", title: "Dialogue — Ten papír je dobrý.", rows: [
+        ["","Dobrý den. / Dobrý den.","Hello. / Hello."],
+        ["1","Tady je papír. Je ten papír dobrý?","Here is paper. Is that paper good?"],
+        ["","Ano, ten papír je dobrý.","Yes, that paper is good."],
+        ["2","Je ta mapa dobrá?","Is that map good?"],
+        ["","Ano, ta mapa je dobrá.","Yes, that map is good."],
+        ["3","Je to rádio dobré?","Is that radio good?"],
+        ["","Ano, to rádio je dobré.","Yes, that radio is good."],
+        ["4","Je tady stůl? Jaký je ten stůl?","Is there a table here? What is it like?"],
+        ["","Ano, tady je stůl. Ten stůl je velký.","Yes. That table is large."],
+        ["5","Je tady lístek? Jaký je ten lístek?","Is there a ticket? What is it like?"],
+        ["","Ten lístek je malý.","That ticket is small."],
+        ["6","Jaká je ta káva?","What is that coffee like?"],
+        ["","Ta káva je dobrá.","That coffee is good."],
+        ["7","Jaké je to mléko?","What is that milk like?"],
+        ["","To mléko je špatné.","That milk is bad."],
+      ]},
+      { type: "vocab", title: "Vocabulary", rows: [
+        ["dobrý/dobrá/dobré","m/f/n","good"],["špatný/á/é","m/f/n","bad"],
+        ["velký/á/é","m/f/n","big, large"],["malý/á/é","m/f/n","small"],
+        ["nový/á/é","m/f/n","new"],["starý/á/é","m/f/n","old"],
+        ["ten/ta/to","m/f/n","that (demonstrative)"],
+        ["jaký/á/é","m/f/n","what kind of? what is…like?"],
+        ["papír","m.","paper"],["stůl","m.","table"],["lístek","m.","ticket/note"],
+        ["káva","f.","coffee"],["mléko","n.","milk"],["rádio","n.","radio"],
+        ["dobrý den","","good day / hello"],
+      ]},
+      { type: "grammar", title: "Grammar: Adjective Gender Agreement", html: `<p>Adjectives agree with their noun in gender:<br>
+<code>Masculine</code>: ten dobrý papír<br>
+<code>Feminine</code>: ta dobrá mapa<br>
+<code>Neuter</code>: to dobré rádio</p>
+<p>The question <code>Jaký/Jaká/Jaké je...?</code> asks "what is ... like?"</p>
+<p><strong>Long vowels change meaning:</strong> <em>byt</em> (apartment) ≠ <em>být</em> (to be). Always pronounce them distinctly longer.</p>` },
+      { type: "pdfs", files: [
+        { label: "Pronunciation Dialogues", pages: "pp. 29–50", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
+      ]},
+    ]
+  },
+
+  {
+    id: "b-d04", group: "basic-dialog",
+    title: "Lesson 8: I Am Not a Private",
+    tapeLabel: "Tape 04",
+    tag: "Vol 1 · Lesson 8",
+    audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 04 Vol 01 Less 08.mp3`,
+    audioLabel: "Tape 04 — Lesson 8",
+    sections: [
+      { type: "intro", text: "<strong>Focus:</strong> Verb <em>být</em> (to be) — all persons. Negation with <em>ne-</em>. Diphthong <em>ej</em>, clusters pr/tl/kr." },
+      { type: "dialogue", title: "Dialogue — Já nejsem vojín.", rows: [
+        ["1","Dobré jitro. / Dobré jitro.","Good morning. / Good morning."],
+        ["2","Jste vy letec?","Are you an airman?"],
+        ["","Ano, já jsem letec.","Yes, I am an airman."],
+        ["3","Jste vy student?","Are you a student?"],
+        ["","Ne, já nejsem student. Já jsem kapitán.","No, I am not a student. I am a captain."],
+        ["4","Je on vojín?","Is he a private?"],
+        ["","Ne, on není vojín. On je rotný.","No, he is not a private. He is a corporal."],
+        ["5","Kdo je to?","Who is that?"],
+        ["","To je pan Novák. On je dobrý voják.","That is Mr. Novák. He is a good soldier."],
+        ["6","Je to nový stůl?","Is that a new table?"],
+        ["","Ano, to je nový stůl.","Yes, that is a new table."],
+        ["7","Je ta mapa stará?","Is that map old?"],
+        ["","Ne, ta mapa není stará. Ta mapa je nová.","No, that map is not old. That map is new."],
+      ]},
+      { type: "vocab", title: "Verb být — Present Tense", rows: [
+        ["já jsem","","I am"],["ty jsi","","you are (informal)"],
+        ["on/ona/ono je","","he/she/it is"],["my jsme","","we are"],
+        ["vy jste","","you are (formal/pl.)"],["oni jsou","","they are"],
+        ["já nejsem","","I am not"],["on/ona není","","he/she/it is not"],
+        ["vy nejste","","you are not"],
+      ]},
+      { type: "vocab", title: "Military Ranks", rows: [
+        ["vojín","m.","private"],["svobodník","m.","private first class"],
+        ["desátník","m.","corporal"],["rotný","m.","sergeant"],
+        ["rotmistr","m.","staff sergeant"],["praporčík","m.","warrant officer"],
+        ["kapitán","m.","captain"],["voják","m.","soldier"],["letec","m.","airman"],
+      ]},
+      { type: "grammar", title: "Grammar: Negation", html: `<p>Negation = add <code>ne-</code> to the verb: <em>jsem → nejsem</em>, <em>je → není</em>, <em>jste → nejste</em>.</p><p>In colloquial speech, the <em>j</em> in <em>jsem/jste</em> is often silent (sounds like <em>sem/ste</em>). In <em>nejsem/nejste</em>, the <em>j</em> is always pronounced.</p>` },
+      { type: "pdfs", files: [
+        { label: "Pronunciation Dialogues", pages: "pp. 51–66", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
+      ]},
+    ]
+  },
+
+  {
+    id: "b-d05", group: "basic-dialog",
+    title: "Lesson 9: How Is the Weather?",
+    tapeLabel: "Tape 05",
+    tag: "Vol 1 · Lesson 9",
+    audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 05 Vol 01 Less 09.mp3`,
+    audioLabel: "Tape 05 — Lesson 9",
+    sections: [
+      { type: "intro", text: "<strong>Focus:</strong> Palatal nasal /ň/. Negation <em>není</em> with adjectives. Weather expressions. Nationality adjectives." },
+      { type: "dialogue", title: "Dialogue — Jak je dnes?", rows: [
+        ["1","Jak je dnes venku?","How is it outside today?"],
+        ["","Dnes není venku pěkně.","Today it's not nice outside."],
+        ["2","Je dnes teplo?","Is it warm today?"],
+        ["","Ne, dnes je zima.","No, today it is cold."],
+        ["3","Jaká je ta snídaně?","What is that breakfast like?"],
+        ["","Snídaně není moc velká, ale je dobrá.","Breakfast isn't very big, but it is good."],
+        ["4","Je Novák voják?","Is Novák a soldier?"],
+        ["","Ano, Novák je vojín. Novotný je starý voják.","Yes, Novák is a private. Novotný is an old soldier."],
+        ["5","Je ten český slovník starý?","Is that Czech dictionary old?"],
+        ["","Ten český slovník je starý, ale dobrý.","That Czech dictionary is old, but good."],
+        ["6","Je ta anglická kniha stará?","Is that English book old?"],
+        ["","Ano, ta anglická kniha je taky stará.","Yes, that English book is also old."],
+      ]},
+      { type: "vocab", title: "Vocabulary", rows: [
+        ["dnes","","today"],["pěkně","","nicely, pleasant (weather)"],
+        ["snídaně","f.","breakfast"],["slovník","m.","dictionary"],["kniha","f.","book"],
+        ["český/á/é","","Czech"],["anglický/á/é","","English"],
+        ["nízký/á/é","","low"],["vysoký/á/é","","high, tall"],
+      ]},
+      { type: "grammar", title: "Grammar: Nationality Adjectives", html: `<p>Nationality adjectives follow the same gender rules. Note: in Czech they are <strong>not</strong> capitalized: <em>český slovník</em>, <em>anglická kniha</em>.</p><p>The palatal <strong>/ň/</strong>: like Spanish <em>ñ</em> or "ny" in "canyon". Spelled <em>ň</em> or appears automatically before <em>i/í</em>.</p>` },
+      { type: "pdfs", files: [
+        { label: "Pronunciation Dialogues", pages: "pp. 67–86", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
+      ]},
+    ]
+  },
+
+  {
+    id: "b-d06", group: "basic-dialog",
+    title: "Lesson 10: Who Has the Pencil?",
+    tapeLabel: "Tape 06",
+    tag: "Vol 1 · Lesson 10",
+    audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 06 Vol 01 Less 10.mp3`,
+    audioLabel: "Tape 06 — Lesson 10",
+    sections: [
+      { type: "intro", text: "<strong>Focus:</strong> Accusative case — the form nouns take as direct objects. Verbs <em>mít</em> (have), <em>hledat</em> (look for), <em>vidět</em> (see)." },
+      { type: "dialogue", title: "Dialogue — Kdo má tužku?", rows: [
+        ["1","Kdo má mapu?","Who has the map?"],
+        ["","Ten kapitán má mapu.","That captain has the map."],
+        ["2","Má on taky slovník?","Does he also have a dictionary?"],
+        ["","Ne, on nemá slovník. On hledá slovník.","No, he doesn't have one. He is looking for a dictionary."],
+        ["3","Co hledáte?","What are you looking for?"],
+        ["","Já hledám tužku.","I am looking for a pencil."],
+        ["4","Vidíte tu mapu?","Do you see that map?"],
+        ["","Ano, vidím tu mapu.","Yes, I see that map."],
+        ["5","Má ten rotmistr papír?","Does the staff sergeant have paper?"],
+        ["","Ano, má nějaký papír a tužku.","Yes, he has some paper and a pencil."],
+        ["6","Hledáte ten slovník?","Are you looking for that dictionary?"],
+        ["","Ano, já hledám ten slovník.","Yes, I am looking for that dictionary."],
+      ]},
+      { type: "vocab", title: "New Verbs", rows: [
+        ["mám / máš / má","","I have / you have / he has"],
+        ["nemám / nemá","","I don't have / he doesn't have"],
+        ["hledám / hledáte / hledá","","I look for / you look for / he looks for"],
+        ["vidím / vidíte / vidí","","I see / you see / he sees"],
+        ["nějaký","","some, any"],
+      ]},
+      { type: "grammar", title: "Grammar: Accusative Case", html: `<p>Direct objects take the <strong>accusative case</strong>:</p>
+<p><code>Feminine -a</code>: mapa → mapu, tužka → tužku<br>
+<code>Feminine -e</code>: židle → židli; demonstrative: ta → tu<br>
+<code>Neuter</code>: no change → to kolo, ten slovník (masc. inanimate: no change)<br>
+<code>Masculine animate</code>: different form — covered in Lesson 11</p>
+<p>Examples: <em>Vidím tu mapu.</em> | <em>Hledám tužku.</em></p>` },
+      { type: "pdfs", files: [
+        { label: "Pronunciation Dialogues", pages: "pp. 85–106", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
+      ]},
+    ]
+  },
+
+  {
+    id: "b-d07", group: "basic-dialog",
+    title: "Lesson 11: He Doesn't Know Him",
+    tapeLabel: "Tape 07",
+    tag: "Vol 1 · Lesson 11",
+    audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 07 Vol 01 Less 11.mp3`,
+    audioLabel: "Tape 07 — Lesson 11",
+    sections: [
+      { type: "intro", text: "<strong>Focus:</strong> Accusative of animate masculine nouns and personal pronouns. Verbs <em>jít</em> (go), <em>vidět</em> (see), <em>znát/vědět</em> (know). Preposition <em>pro</em> (for/to get)." },
+      { type: "dialogue", title: "Dialogue — On ho nezná, ale zná ji.", rows: [
+        ["1","Kdo sedí tady?","Who is sitting here?"],
+        ["","Tady sedí rotmistr Němec.","Staff Sergeant Němec is sitting here."],
+        ["2","Má nějaký papír a tužku?","Does he have any paper and a pencil?"],
+        ["","Ano, má nějaký papír a tužku.","Yes, he has some paper and a pencil."],
+        ["3","Kdo sedí tamhle?","Who is sitting over there?"],
+        ["","Tamhle sedí kpt. Novák.","Captain Novák is sitting over there."],
+        ["4","Je to dobrý voják?","Is he a good soldier?"],
+        ["","Ano, je to dobrý voják. Je letec.","Yes, he is a good soldier. He is an airman."],
+        ["5","Ten praporčík jde pro kpt. Nováka.","That warrant officer goes to get Captain Novák."],
+        ["6","On nevidí kpt. Nováka, ale vidí rtm. Němce.","He doesn't see Captain Novák, but he sees Sergeant Němec."],
+        ["7","Taky tam je nějaký nový desátník.","There is also some new corporal there."],
+        ["8","Ten taky hledá toho kapitána letce.","He also is looking for that airman captain."],
+      ]},
+      { type: "vocab", title: "Vocabulary", rows: [
+        ["sedím/sedí","","I sit / he sits"],["jdu/jde","","I go / he goes"],
+        ["pro + acc.","","for (to get/fetch)"],["tamhle","","over there"],
+        ["znám/zná","","I know (a person) / he knows"],
+        ["vím/ví","","I know (a fact) / he knows"],
+        ["toho","","him/that (accusative of ten, animate)"],
+      ]},
+      { type: "grammar", title: "Grammar: Accusative Animate Masculine", html: `<p>Masculine animate nouns (people, animals) change in the accusative:</p>
+<p><code>Soft pattern</code> (ends in -c, -č, -ř, -j, -l, -s, -z): add <code>-e</code> → letec → letce, Němec → Němce<br>
+<code>Hard pattern</code> (ends in other consonants): add <code>-a</code> → student → studenta, Novák → Nováka<br>
+<code>Ends in -a</code>: add <code>-u</code> → Svoboda → Svobodu</p>
+<p>Demonstrative: ten → toho (animate)<br>
+Pronoun: on → ho/jej</p>` },
+      { type: "pdfs", files: [
+        { label: "Pronunciation Dialogues", pages: "pp. 107–126", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
+      ]},
+    ]
+  },
+
+  {
+    id: "b-d08", group: "basic-dialog",
+    title: "Lesson 12: I Have a Toothache",
+    tapeLabel: "Tape 08",
+    tag: "Vol 1 · Lesson 12",
+    audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 08 Vol 01 Less 12.mp3`,
+    audioLabel: "Tape 08 — Lesson 12",
+    sections: [
+      { type: "intro", text: "<strong>Focus:</strong> Syllabic consonants /l, r/ (as in <em>vlk</em> = wolf, <em>krk</em> = neck). Enclitic pronouns: mě, tě, ho, se. Accusative of personal pronouns continued." },
+      { type: "dialogue", title: "Dialogue — Mám bolení zubu.", rows: [
+        ["1","Jak se máte?","How are you?"],
+        ["","Není to dobré. Mám bolení zubu.","Not good. I have a toothache."],
+        ["2","To je škoda. Kde máte doktora?","That's too bad. Where is your doctor?"],
+        ["","Já ho hledám.","I am looking for him."],
+        ["3","Vidíte ho?","Do you see him?"],
+        ["","Ano, vidím ho tam.","Yes, I see him there."],
+        ["4","Zná on vás?","Does he know you?"],
+        ["","Ano, on mě zná.","Yes, he knows me."],
+        ["5","Čeká on na vás?","Is he waiting for you?"],
+        ["","Ano, čeká na mě.","Yes, he is waiting for me."],
+      ]},
+      { type: "vocab", title: "Vocabulary", rows: [
+        ["jak se máte?","","How are you? (formal)"],
+        ["bolení zubu","","toothache (lit. pain of tooth)"],
+        ["škoda","","pity, too bad"],
+        ["doktor","m.","doctor"],
+        ["čekat na + acc.","","to wait for"],
+        ["mě/tě","","me/you (accusative)"],
+        ["ho/jej","","him (accusative)"],
+        ["nás/vás","","us/you (accusative pl./formal)"],
+      ]},
+      { type: "grammar", title: "Grammar: Personal Pronouns — Accusative", html: `<p>Accusative pronouns (short/enclitic forms — used after a verb or in mid-sentence):</p>
+<p><code>já → mě</code> (me) | <code>ty → tě</code> (you) | <code>on → ho</code> (him)<br>
+<code>ona → ji</code> (her) | <code>ono → ho</code> (it) | <code>my → nás</code> (us)<br>
+<code>vy → vás</code> (you pl./formal) | <code>oni → je</code> (them)</p>
+<p>Enclitics go in the second position in the sentence: <em>Já ho hledám.</em> (I am looking for him.)</p>` },
+      { type: "pdfs", files: [
+        { label: "Pronunciation Dialogues", pages: "pp. 127–148", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
+      ]},
+    ]
+  },
+
+  { id: "b-d09", group: "basic-dialog", title: "Lessons 1–11: Review", tapeLabel: "Tape 09",
+    tag: "Vol 1 · Review Tape", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 09 Vol 01 Less 01-11.mp3`,
+    audioLabel: "Tape 09 — Lessons 1–11 Review",
+    sections: [
+      { type: "intro", text: "Full review of Vol 1 Lessons 1–11. Listen without looking at notes first. This tape recaps all key dialogues and drills at natural pace." },
+      { type: "pdfs", files: [
+        { label: "Cartoon Guides Less 1–95", path: `${B}/t/Czech Basic Course/Cartoon Guides Less 01-95.pdf` },
+        { label: "Standard Situations & Stories", path: `${B}/t/Czech Basic Course/Standard Situations & Stories Cartoons.pdf` },
+        { label: "Grammar Exercises Vol 1", path: `${B}/t/Czech Basic Course/Vol 01 Part 01 Less 01-19 Grammar Practice Exercises.pdf` },
+      ]},
+    ]
+  },
+  { id: "b-d10", group: "basic-dialog", title: "Lessons 12–20", tapeLabel: "Tape 10",
+    tag: "Vol 1 · Lessons 12–20", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 10 Vol 01 Less 12-20.mp3`,
+    audioLabel: "Tape 10 — Lessons 12–20",
+    sections: [
+      { type: "intro", text: "Lessons 12–20 cover: locative case, dative case, genitive case, present tense of type-1 verbs, and expanded vocabulary." },
+      { type: "pdfs", files: [
+        { label: "Textbook Vol 1 (Less 1–20)", path: `${B}/t/Czech Basic Course/Vol 01 Less 01-20 Writing-Intermediate Phase.pdf` },
+        { label: "Grammar Exercises Part 1", path: `${B}/t/Czech Basic Course/Vol 01 Part 01 Less 01-19 Grammar Practice Exercises.pdf` },
+        { label: "Grammar Exercises Part 2", path: `${B}/t/Czech Basic Course/Vol 01 Part 02 Less 21-44 Grammar Practice Exercises.pdf` },
+      ]},
+    ]
+  },
+  { id: "b-d11", group: "basic-dialog", title: "Lessons 21–29", tapeLabel: "Tape 11",
+    tag: "Vol 2 · Lessons 21–29", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 11 Vol 02 Less 21-29.mp3`,
+    audioLabel: "Tape 11 — Lessons 21–29",
+    sections: [
+      { type: "intro", text: "Vol 2 begins. Topics include: past tense of verbs, instrumental case, numbers in context, more complex sentence structures." },
+      { type: "pdfs", files: [
+        { label: "Textbook Vol 2 (Less 21–45)", path: `${B}/t/Czech Basic Course/Vol 02 Less 21-45.pdf` },
+        { label: "Grammar Exercises Part 2", path: `${B}/t/Czech Basic Course/Vol 01 Part 02 Less 21-44 Grammar Practice Exercises.pdf` },
+      ]},
+    ]
+  },
+  { id: "b-d12", group: "basic-dialog", title: "Lessons 30–39", tapeLabel: "Tape 12", tag: "Vol 2 · Lessons 30–39", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 12 Vol 02 Less 30-39.mp3`, audioLabel: "Tape 12 — Lessons 30–39", sections: [{ type: "intro", text: "Continuation of Vol 2: conditional mood, reflexive verbs, verb aspect (perfective vs imperfective) introduction." }, { type: "pdfs", files: [{ label: "Textbook Vol 2 (Less 21–45)", path: `${B}/t/Czech Basic Course/Vol 02 Less 21-45.pdf` }]}]},
+  { id: "b-d13", group: "basic-dialog", title: "Lessons 40–45", tapeLabel: "Tape 13", tag: "Vol 2 · Lessons 40–45", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 13 Vol 02 Less 40-45.mp3`, audioLabel: "Tape 13 — Lessons 40–45", sections: [{ type: "intro", text: "Completing Vol 2: nominal declension review, verb conjugation types, reading and writing exercises." }, { type: "pdfs", files: [{ label: "Textbook Vol 2 (Less 21–45)", path: `${B}/t/Czech Basic Course/Vol 02 Less 21-45.pdf` }, { label: "Textbook Vol 2b (Less 46–69)", path: `${B}/t/Czech Basic Course/Vol 02 Less 46-69.pdf` }]}]},
+  { id: "b-d14", group: "basic-dialog", title: "Lessons 46–51", tapeLabel: "Tape 14", tag: "Vol 3 · Lessons 46–51", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 14 Vol 03 Less 46-51.mp3`, audioLabel: "Tape 14 — Lessons 46–51", sections: [{ type: "intro", text: "Vol 3 starts. Advanced grammar: verb aspect pairs, imperative mood, complex noun phrases." }, { type: "pdfs", files: [{ label: "Textbook Vol 3 (Less 46–70)", path: `${B}/t/Czech Basic Course/Vol 03 Less 46-70.pdf` }]}]},
+  { id: "b-d15", group: "basic-dialog", title: "Lessons 52–58", tapeLabel: "Tape 15", tag: "Vol 3 · Lessons 52–58", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 15 Vol 03 Less 52-58.mp3`, audioLabel: "Tape 15 — Lessons 52–58", sections: [{ type: "intro", text: "Topics: relative clauses, subordinate clauses with <em>že/aby/když</em>, more aspect pairs." }, { type: "pdfs", files: [{ label: "Textbook Vol 3 (Less 46–70)", path: `${B}/t/Czech Basic Course/Vol 03 Less 46-70.pdf` }]}]},
+  { id: "b-d16", group: "basic-dialog", title: "Lessons 59–64", tapeLabel: "Tape 16", tag: "Vol 3 · Lessons 59–64", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 16 Vol 03 Less 59-64.mp3`, audioLabel: "Tape 16 — Lessons 59–64", sections: [{ type: "intro", text: "Comparative and superlative adjectives. Motion verbs (ít/jít/jet/letět) and prefixes." }, { type: "pdfs", files: [{ label: "Textbook Vol 3 (Less 46–70)", path: `${B}/t/Czech Basic Course/Vol 03 Less 46-70.pdf` }]}]},
+  { id: "b-d17", group: "basic-dialog", title: "Lessons 65–70", tapeLabel: "Tape 17", tag: "Vol 3 · Lessons 65–70", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 17 Vol 03 Less 65-70.mp3`, audioLabel: "Tape 17 — Lessons 65–70", sections: [{ type: "intro", text: "Completing Vol 3: verbal nouns, participles, formal written register vs. spoken Czech." }, { type: "pdfs", files: [{ label: "Textbook Vol 3 (Less 71–89)", path: `${B}/t/Czech Basic Course/Vol 03 Less 71-89.pdf` }]}]},
+  { id: "b-d18", group: "basic-dialog", title: "Lessons 71–80", tapeLabel: "Tape 18", tag: "Vol 4 · Lessons 71–80", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 18 Vol 04 Less 71-80.mp3`, audioLabel: "Tape 18 — Lessons 71–80", sections: [{ type: "intro", text: "Vol 4: Complex tenses (future with být + infinitive), passive voice, numerals and their agreement." }, { type: "pdfs", files: [{ label: "Textbook Vol 4 (Less 71–90)", path: `${B}/t/Czech Basic Course/Vol 04 Less 71-90.pdf` }]}]},
+  { id: "b-d19", group: "basic-dialog", title: "Lessons 81–90", tapeLabel: "Tape 19", tag: "Vol 4 · Lessons 81–90", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 19 Vol 04 Less 81-90.mp3`, audioLabel: "Tape 19 — Lessons 81–90", sections: [{ type: "intro", text: "Completing Vol 4: advanced declension (mixed and irregular nouns), formal correspondence." }, { type: "pdfs", files: [{ label: "Textbook Vol 4 (Less 91–127)", path: `${B}/t/Czech Basic Course/Vol 04 Less 91-127.pdf` }]}]},
+  { id: "b-d20", group: "basic-dialog", title: "Lessons 91–100", tapeLabel: "Tape 20", tag: "Vol 5 · Lessons 91–100", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 20 Vol 05 Less 91-100 .mp3`, audioLabel: "Tape 20 — Lessons 91–100", sections: [{ type: "intro", text: "Vol 5 begins: highly idiomatic language, proverbs, complex discourse markers, reported speech." }, { type: "pdfs", files: [{ label: "Textbook Vol 5 (Less 91–110)", path: `${B}/t/Czech Basic Course/Vol 05 Less 91-110.pdf` }]}]},
+  { id: "b-d21", group: "basic-dialog", title: "Lessons 101–110", tapeLabel: "Tape 21", tag: "Vol 5 · Lessons 101–110", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 21 Vol 05 Less 101-110.mp3`, audioLabel: "Tape 21 — Lessons 101–110", sections: [{ type: "intro", text: "Advanced reading texts: newspaper-style articles, official documents, technical Czech." }, { type: "pdfs", files: [{ label: "Textbook Vol 5 (Less 91–110)", path: `${B}/t/Czech Basic Course/Vol 05 Less 91-110.pdf` }]}]},
+  { id: "b-d22", group: "basic-dialog", title: "Lessons 111–122", tapeLabel: "Tape 22", tag: "Vol 5 · Lessons 111–122", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 22 Vol 05 Less 111-122.mp3`, audioLabel: "Tape 22 — Lessons 111–122", sections: [{ type: "intro", text: "Completing Vol 5: mastery-level drills, translation exercises, free conversation practice." }, { type: "pdfs", files: [{ label: "Textbook Vol 6 (Less 111–130)", path: `${B}/t/Czech Basic Course/Vol 06 Less 111-130.pdf` }]}]},
+  { id: "b-d23", group: "basic-dialog", title: "Lessons 123–130", tapeLabel: "Tape 23", tag: "Vol 6 · Lessons 123–130", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 23 Vol 06 Less 123-130.mp3`, audioLabel: "Tape 23 — Lessons 123–130", sections: [{ type: "intro", text: "Vol 6: Military and professional vocabulary in context." }, { type: "pdfs", files: [{ label: "Textbook Vol 6 (Less 111–130)", path: `${B}/t/Czech Basic Course/Vol 06 Less 111-130.pdf` }]}]},
+  { id: "b-d24", group: "basic-dialog", title: "Lessons 131–143", tapeLabel: "Tape 24", tag: "Vol 7 · Lessons 131–143", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 24 Vol 07 Less 131-143.mp3`, audioLabel: "Tape 24 — Lessons 131–143", sections: [{ type: "intro", text: "Vol 7: Final lessons — near-native fluency drills, complex situational dialogues." }, { type: "pdfs", files: [{ label: "Textbook Vol 7 (Less 131–150)", path: `${B}/t/Czech Basic Course/Vol 07 Less 131-150.pdf` }]}]},
+  { id: "b-d25", group: "basic-dialog", title: "Lessons 144–150", tapeLabel: "Tape 25", tag: "Vol 7 · Lessons 144–150", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 25 Vol 07 Less 144-140.mp3`, audioLabel: "Tape 25 — Lessons 144–150", sections: [{ type: "intro", text: "Penultimate tape: final grammar consolidation, reading comprehension practice." }, { type: "pdfs", files: [{ label: "Textbook Vol 7 (Less 131–150)", path: `${B}/t/Czech Basic Course/Vol 07 Less 131-150.pdf` }]}]},
+  { id: "b-d26", group: "basic-dialog", title: "Appendix", tapeLabel: "Tape 26", tag: "Vol 7 · Appendix", audio: `${B}/t/Czech Basic Course Dialog MP3/Tape 26 Vol 07 Appendix 01-.mp3`, audioLabel: "Tape 26 — Appendix", sections: [{ type: "intro", text: "Appendix materials: supplementary pronunciation review, common idioms, songs of Czechoslovakia." }, { type: "pdfs", files: [{ label: "Songs of Czechoslovakia", path: `${B}/t/Czech Basic Course/Songs of Czechoslovakia.pdf` }, { label: "Dictionary Part 1", path: `${B}/t/Czech Basic Course/Dictionary Part 01.pdf` }, { label: "Dictionary Part 2", path: `${B}/t/Czech Basic Course/Dictionary Part 02.pdf` }, { label: "Dictionary Part 3", path: `${B}/t/Czech Basic Course/Dictionary Part 03.pdf` }]}]},
+
+  // ── DRILL TAPES ──────────────────────────────────────────────────────────
+  { id: "b-dr01", group: "basic-drill", title: "Numbers Units 1–11", tapeLabel: "Drill 01",
+    tag: "Numbers", audio: `${B}/t/Czech Basic Course MP3/Tape 01 Numbers Unit 01-11.mp3`,
+    audioLabel: "Drill Tape 01 — Numbers Units 1–11",
+    sections: [
+      { type: "intro", text: "Number drills Units 1–11. Repeat each number and phrase after the speaker." },
+      { type: "vocab", title: "Numbers 0–10", rows: [
+        ["nula","","0"],["jedna / jeden","f./m.","1"],["dva / dvě","m./f.+n.","2"],
+        ["tři","","3"],["čtyři","","4"],["pět","","5"],["šest","","6"],
+        ["sedm","","7"],["osm","","8"],["devět","","9"],["deset","","10"],
+      ]},
+      { type: "vocab", title: "Numbers 11–20", rows: [
+        ["jedenáct","","11"],["dvanáct","","12"],["třináct","","13"],["čtrnáct","","14"],
+        ["patnáct","","15"],["šestnáct","","16"],["sedmnáct","","17"],["osmnáct","","18"],
+        ["devatenáct","","19"],["dvacet","","20"],
+      ]},
+    ]
+  },
+  { id: "b-dr02", group: "basic-drill", title: "Numbers Units 12–19", tapeLabel: "Drill 02", tag: "Numbers", audio: `${B}/t/Czech Basic Course MP3/Tape 02 Numbers Unit 12-19.mp3`, audioLabel: "Drill Tape 02 — Numbers Units 12–19", sections: [{ type: "intro", text: "Number drills Units 12–19: tens, hundreds, larger numbers." }, { type: "vocab", title: "Numbers 21–1000", rows: [["dvacet jedna","","21"],["třicet","","30"],["čtyřicet","","40"],["padesát","","50"],["šedesát","","60"],["sedmdesát","","70"],["osmdesát","","80"],["devadesát","","90"],["sto","","100"],["tisíc","","1,000"]]}]},
+  { id: "b-dr03", group: "basic-drill", title: "Numbers Units 20–24", tapeLabel: "Drill 03", tag: "Numbers", audio: `${B}/t/Czech Basic Course MP3/Tape 03 Numbers Unit 20-24.mp3`, audioLabel: "Drill Tape 03 — Numbers Units 20–24", sections: [{ type: "intro", text: "Ordinal numbers and numbers in context (dates, times, quantities)." }, { type: "pdfs", files: [{ label: "Textbook Vol 1", path: `${B}/t/Czech Basic Course/Vol 01 Less 01-20 Writing-Intermediate Phase.pdf` }]}]},
+  { id: "b-dr04", group: "basic-drill", title: "Numbers Units 25–28", tapeLabel: "Drill 04", tag: "Numbers", audio: `${B}/t/Czech Basic Course MP3/Tape 04 Numbers Unit 25-28.mp3`, audioLabel: "Drill Tape 04 — Numbers Units 25–28", sections: [{ type: "intro", text: "Advanced numbers: fractions, large numbers, numbers with nouns (genitive agreement)." }, { type: "pdfs", files: [{ label: "Textbook Vol 1", path: `${B}/t/Czech Basic Course/Vol 01 Less 01-20 Writing-Intermediate Phase.pdf` }]}]},
+  { id: "b-dr05", group: "basic-drill", title: "Geography Units (1)", tapeLabel: "Drill 05", tag: "Geography", audio: `${B}/t/Czech Basic Course MP3/Tape 05 Geographical Unit 0.mp3`, audioLabel: "Drill Tape 05 — Geography", sections: [{ type: "intro", text: "Czech geographical vocabulary: regions, cities, rivers, borders of Czechoslovakia." }, { type: "pdfs", files: [{ label: "Geography of Czechoslovakia", path: `${B}/t/Czech Basic Course/Geography of Czechoslovakia.pdf` }]}]},
+  { id: "b-dr06", group: "basic-drill", title: "Geography Units (2)", tapeLabel: "Drill 06", tag: "Geography", audio: `${B}/t/Czech Basic Course MP3/Tape 06 Geographical Unit 0.mp3`, audioLabel: "Drill Tape 06 — Geography (cont.)", sections: [{ type: "intro", text: "Continued geography drills: place names, directions, map-reading vocabulary." }, { type: "pdfs", files: [{ label: "Geography of Czechoslovakia", path: `${B}/t/Czech Basic Course/Geography of Czechoslovakia.pdf` }, { label: "Military Terminology", path: `${B}/t/Czech Basic Course/Military Terminology.pdf` }]}]},
+  { id: "b-dr07", group: "basic-drill", title: "Geography Units (3)", tapeLabel: "Drill 07", tag: "Geography", audio: `${B}/t/Czech Basic Course MP3/Tape 07 Geographical Unit 1.mp3`, audioLabel: "Drill Tape 07 — Geography (cont.)", sections: [{ type: "intro", text: "Geographic and military terrain vocabulary." }, { type: "pdfs", files: [{ label: "Geography of Czechoslovakia", path: `${B}/t/Czech Basic Course/Geography of Czechoslovakia.pdf` }]}]},
+  { id: "b-dr08", group: "basic-drill", title: "Geography Units (4)", tapeLabel: "Drill 08", tag: "Geography", audio: `${B}/t/Czech Basic Course MP3/Tape 08 Geographical Unit 1.mp3`, audioLabel: "Drill Tape 08 — Geography (cont.)", sections: [{ type: "intro", text: "Final geography drills: border crossings, garrison towns, military installations." }, { type: "pdfs", files: [{ label: "Geography of Czechoslovakia", path: `${B}/t/Czech Basic Course/Geography of Czechoslovakia.pdf` }, { label: "Illustrated Military Situations", path: `${B}/t/Czech Basic Course/Illustrated Military Situations.pdf` }]}]},
+  { id: "b-dr09", group: "basic-drill", title: "Geography Units (5)", tapeLabel: "Drill 09", tag: "Geography", audio: `${B}/t/Czech Basic Course MP3/Tape 09 Geographical Unit 1.mp3`, audioLabel: "Drill Tape 09 — Geography (cont.)", sections: [{ type: "intro", text: "Geography comprehension exercises." }, { type: "pdfs", files: [{ label: "Geography of Czechoslovakia", path: `${B}/t/Czech Basic Course/Geography of Czechoslovakia.pdf` }]}]},
+  { id: "b-dr10", group: "basic-drill", title: "Names of Persons", tapeLabel: "Drill 10", tag: "Names", audio: `${B}/t/Czech Basic Course MP3/Tape 10 Names of Persons Un.mp3`, audioLabel: "Drill Tape 10 — Names of Persons", sections: [{ type: "intro", text: "Czech personal names: declension of first names and surnames, forms of address." }, { type: "pdfs", files: [{ label: "Military Terminology", path: `${B}/t/Czech Basic Course/Military Terminology.pdf` }]}]},
+  { id: "b-dr11", group: "basic-drill", title: "Weather Forecast (1)", tapeLabel: "Drill 11", tag: "Weather", audio: `${B}/t/Czech Basic Course MP3/Tape 11 Weather Forecast Un.mp3`, audioLabel: "Drill Tape 11 — Weather Forecast", sections: [{ type: "intro", text: "Weather forecast vocabulary and listening comprehension drills." }, { type: "vocab", title: "Weather Vocabulary", rows: [["oblačno","","cloudy"],["jasno","","clear"],["mlha","f.","fog"],["vítr","m.","wind"],["déšť","m.","rain"],["sníh","m.","snow"],["bouřka","f.","thunderstorm"],["teplota","f.","temperature"],["stupně","","degrees"],["předpověď počasí","","weather forecast"]]}]},
+  { id: "b-dr12", group: "basic-drill", title: "Weather Forecast (2)", tapeLabel: "Drill 12", tag: "Weather", audio: `${B}/t/Czech Basic Course MP3/Tape 12 Weather Forecast Un.mp3`, audioLabel: "Drill Tape 12 — Weather Forecast (cont.)", sections: [{ type: "intro", text: "Advanced weather report comprehension." }, { type: "pdfs", files: [{ label: "Listening Comprehension Exercises", path: `${B}/t/Czech Basic Course/Listening Comprehension Exercise.pdf` }]}]},
+
+  ] // end basic units
+},
+
+// ────────────────────────────────────────────────────────────────────────────
+// 2. CZECH PROFICIENCY IMPROVEMENT COURSE
+// ────────────────────────────────────────────────────────────────────────────
+{
+  id: "proficiency",
+  title: "Czech Proficiency Improvement",
+  description: "Intermediate–advanced. 9 tapes, 50 units across 4 workbook volumes.",
+  color: "#3d6b3d",
+  groups: [
+    { id: "prof-tape", label: "Audio Tapes (Workbooks 1–10)", defaultOpen: true },
+  ],
+  units: [
+    { id: "p-01", group: "prof-tape", title: "Workbook 1: Units 1–5", tapeLabel: "Tape 01", tag: "Units 1–5", audio: `${B}/t 3/Czech Proficiency Improvement Course MP3/Tape 01 Workbook 01.mp3`, audioLabel: "Tape 01 — Workbook 1 (Units 1–5)", sections: [{ type: "intro", text: "Proficiency Improvement Course begins. Units 1–5 focus on news-register Czech: reading comprehension of radio broadcasts, military communiqués, and news articles. Topics: current events, military operations, geographic descriptions." }, { type: "pdfs", files: [{ label: "Listening Workbook 1 (Units 1–5)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 01 Listening Workbook 01 Units 01-05.pdf` }, { label: "Reading Workbook 1 (Units 1–5)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 01 Reading Workbook 01  Units 01-05.pdf` }]}]},
+    { id: "p-02", group: "prof-tape", title: "Workbooks 2–3: Units 6–15", tapeLabel: "Tape 02", tag: "Units 6–15", audio: `${B}/t 3/Czech Proficiency Improvement Course MP3/Tape 02 Workbook 02-03.mp3`, audioLabel: "Tape 02 — Workbooks 2–3 (Units 6–15)", sections: [{ type: "intro", text: "Units 6–15: Advanced listening — military reports, logistics language, unit strength reporting. Focus on specialized military vocabulary and numbers in context." }, { type: "pdfs", files: [{ label: "Listening Workbook 2–5 (Units 6–25)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 02 Listening Workbook 02-05 Units 06-25.pdf` }, { label: "Reading Workbook 2–5 (Units 6–25)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 02 Reading Workbook 02-05 Units 06-25.pdf` }]}]},
+    { id: "p-03", group: "prof-tape", title: "Workbook 4: Units 16–20", tapeLabel: "Tape 03", tag: "Units 16–20", audio: `${B}/t 3/Czech Proficiency Improvement Course MP3/Tape 03 Workbook 04.mp3`, audioLabel: "Tape 03 — Workbook 4 (Units 16–20)", sections: [{ type: "intro", text: "Units 16–20: Tactical communication, orders and commands, position reporting." }, { type: "pdfs", files: [{ label: "Listening Workbook 2–5 (Units 6–25)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 02 Listening Workbook 02-05 Units 06-25.pdf` }, { label: "Reading Workbook 2–5 (Units 6–25)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 02 Reading Workbook 02-05 Units 06-25.pdf` }]}]},
+    { id: "p-04", group: "prof-tape", title: "Workbook 5: Units 21–25", tapeLabel: "Tape 04", tag: "Units 21–25", audio: `${B}/t 3/Czech Proficiency Improvement Course MP3/Tape 04 Workbook 05.mp3`, audioLabel: "Tape 04 — Workbook 5 (Units 21–25)", sections: [{ type: "intro", text: "Units 21–25: Advanced discourse — interrogation scenarios, field reports, order-of-battle language." }, { type: "pdfs", files: [{ label: "Listening Workbook 2–5 (Units 6–25)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 02 Listening Workbook 02-05 Units 06-25.pdf` }, { label: "Reading Workbook 2–5", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 02 Reading Workbook 02-05 Units 06-25.pdf` }]}]},
+    { id: "p-05", group: "prof-tape", title: "Workbook 6: Units 26–30", tapeLabel: "Tape 05", tag: "Units 26–30", audio: `${B}/t 3/Czech Proficiency Improvement Course MP3/Tape 05 Workbook 06.mp3`, audioLabel: "Tape 05 — Workbook 6 (Units 26–30)", sections: [{ type: "intro", text: "Units 26–30: Complex military scenarios, multi-speaker conversations, authentic intercept material." }, { type: "pdfs", files: [{ label: "Listening Workbook 6–9 (Units 26–45)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 03 Listening Workbook 06-09 Units 26-45.pdf` }, { label: "Reading Workbook 6–9", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 03 Reading Workbook 06-09 Units 26-45.pdf` }]}]},
+    { id: "p-06", group: "prof-tape", title: "Workbook 7: Units 31–35", tapeLabel: "Tape 06", tag: "Units 31–35", audio: `${B}/t 3/Czech Proficiency Improvement Course MP3/Tape 06 Workbook 07.mp3`, audioLabel: "Tape 06 — Workbook 7 (Units 31–35)", sections: [{ type: "intro", text: "Units 31–35: High-speed listening drills, ambiguous language exercises, inferencing from context." }, { type: "pdfs", files: [{ label: "Listening Workbook 6–9 (Units 26–45)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 03 Listening Workbook 06-09 Units 26-45.pdf` }, { label: "Reading Workbook 6–9", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 03 Reading Workbook 06-09 Units 26-45.pdf` }]}]},
+    { id: "p-07", group: "prof-tape", title: "Workbook 8: Units 36–40", tapeLabel: "Tape 07", tag: "Units 36–40", audio: `${B}/t 3/Czech Proficiency Improvement Course MP3/Tape 07 Workbook 08.mp3`, audioLabel: "Tape 07 — Workbook 8 (Units 36–40)", sections: [{ type: "intro", text: "Units 36–40: Advanced military vocabulary in realistic operational context." }, { type: "pdfs", files: [{ label: "Listening Workbook 6–9 (Units 26–45)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 03 Listening Workbook 06-09 Units 26-45.pdf` }, { label: "Reading Workbook 6–9", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 03 Reading Workbook 06-09 Units 26-45.pdf` }]}]},
+    { id: "p-08", group: "prof-tape", title: "Workbook 9: Units 41–45", tapeLabel: "Tape 08", tag: "Units 41–45", audio: `${B}/t 3/Czech Proficiency Improvement Course MP3/Tape 08 Workbook 09.mp3`, audioLabel: "Tape 08 — Workbook 9 (Units 41–45)", sections: [{ type: "intro", text: "Units 41–45: Near-mastery drills, translation-quality comprehension." }, { type: "pdfs", files: [{ label: "Listening Workbook 6–9 (Units 26–45)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 03 Listening Workbook 06-09 Units 26-45.pdf` }]}]},
+    { id: "p-09", group: "prof-tape", title: "Workbook 10: Units 46–50", tapeLabel: "Tape 09", tag: "Units 46–50", audio: `${B}/t 3/Czech Proficiency Improvement Course MP3/Tape 09 Workbook 10.mp3`, audioLabel: "Tape 09 — Workbook 10 (Units 46–50)", sections: [{ type: "intro", text: "Final proficiency units 46–50. Mastery-level listening comprehension across all military domains." }, { type: "pdfs", files: [{ label: "Listening Workbook 10 (Units 46–50)", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 04 Listening Workbook 10 Units 46-50.pdf` }, { label: "Reading Workbook 10", path: `${B}/t 3/Czech Proficiency Improvement Course/Vol 04 Reading Workbook 10 Units 46-50.pdf` }]}]},
+  ]
+},
+
+// ────────────────────────────────────────────────────────────────────────────
+// 3. CZECHOSLOVAK ARTILLERY
+// ────────────────────────────────────────────────────────────────────────────
+{
+  id: "artillery",
+  title: "Czechoslovak Artillery",
+  description: "Specialist course. 10 tapes (20 sides). Artillery units, tactics, fire missions.",
+  color: "#7a3a1a",
+  groups: [
+    { id: "art-tape", label: "Artillery Tapes (10 tapes × 2 sides)", defaultOpen: true },
+  ],
+  units: [
+    { id: "art-01a", group: "art-tape", title: "Tape 1 Side 1", tapeLabel: "Tape 01A", tag: "Artillery", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 01 Side 1.mp3`, audioLabel: "Artillery Tape 01 Side 1", sections: [{ type: "intro", text: "Introduction to Czechoslovak Artillery. Course covers: unit composition, organization, weapons, fire missions, logistics. Begin with organizational structure and identification of artillery units." }, { type: "pdfs", files: [{ label: "Course Manual", path: `${B}/t 2/Czechoslovak Artillery/Course Manual.pdf` }, { label: "Composition, Organization & ID", path: `${B}/t 2/Czechoslovak Artillery/Composition Organization & Identification.pdf` }]}]},
+    { id: "art-01b", group: "art-tape", title: "Tape 1 Side 2", tapeLabel: "Tape 01B", tag: "Artillery", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 01 Side 2.mp3`, audioLabel: "Artillery Tape 01 Side 2", sections: [{ type: "intro", text: "Continuation of unit composition and identification." }, { type: "pdfs", files: [{ label: "Czechoslovak Artillery (main text)", path: `${B}/t 2/Czechoslovak Artillery/Czechoslovak Artillery.pdf` }, { label: "Job Aid", path: `${B}/t 2/Czechoslovak Artillery/Job Aid.pdf` }]}]},
+    { id: "art-02a", group: "art-tape", title: "Tape 2 Side 1", tapeLabel: "Tape 02A", tag: "Strength", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 02 Side 1.mp3`, audioLabel: "Artillery Tape 02 Side 1", sections: [{ type: "intro", text: "Personnel strength reporting. Topics: unit strength, losses, replacements." }, { type: "pdfs", files: [{ label: "Strength — Personnel", path: `${B}/t 2/Czechoslovak Artillery/Strength-Personnel.pdf` }, { label: "Strength — Weapons & Ammo", path: `${B}/t 2/Czechoslovak Artillery/Strength Weapons & Ammunition.pdf` }]}]},
+    { id: "art-02b", group: "art-tape", title: "Tape 2 Side 2", tapeLabel: "Tape 02B", tag: "Strength", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 02 Side 2.mp3`, audioLabel: "Artillery Tape 02 Side 2", sections: [{ type: "intro", text: "Weapons and ammunition inventories." }, { type: "pdfs", files: [{ label: "Strength — Weapons & Ammo", path: `${B}/t 2/Czechoslovak Artillery/Strength Weapons & Ammunition.pdf` }]}]},
+    { id: "art-03a", group: "art-tape", title: "Tape 3 Side 1", tapeLabel: "Tape 03A", tag: "Mission", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 03 Side 1.mp3`, audioLabel: "Artillery Tape 03 Side 1", sections: [{ type: "intro", text: "Mission reporting: fire missions, target descriptions, coordinates." }, { type: "pdfs", files: [{ label: "Mission", path: `${B}/t 2/Czechoslovak Artillery/Mission.pdf` }]}]},
+    { id: "art-03b", group: "art-tape", title: "Tape 3 Side 2", tapeLabel: "Tape 03B", tag: "Mission", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 03 Side 2.mp3`, audioLabel: "Artillery Tape 03 Side 2", sections: [{ type: "intro", text: "Advanced mission language." }, { type: "pdfs", files: [{ label: "Mission", path: `${B}/t 2/Czechoslovak Artillery/Mission.pdf` }, { label: "Air Defense", path: `${B}/t 2/Czechoslovak Artillery/Air Defense.pdf` }]}]},
+    { id: "art-04a", group: "art-tape", title: "Tape 4 Side 1 — Logistics", tapeLabel: "Tape 04A", tag: "Logistics", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 04 Side 1.mp3`, audioLabel: "Artillery Tape 04 Side 1", sections: [{ type: "intro", text: "Artillery logistics: food, water, vehicle maintenance, petroleum." }, { type: "pdfs", files: [{ label: "Logistics — Food, Water, Vehicles, POL", path: `${B}/t 2/Czechoslovak Artillery/Logistics Food & Water,Vehicles,Petroleum,Oil & Lubricants.pdf` }]}]},
+    { id: "art-04b", group: "art-tape", title: "Tape 4 Side 2 — Weapons Logistics", tapeLabel: "Tape 04B", tag: "Logistics", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 04 Side 2.mp3`, audioLabel: "Artillery Tape 04 Side 2", sections: [{ type: "intro", text: "Weapons and ammunition logistics." }, { type: "pdfs", files: [{ label: "Logistics — Weapons & Ammo", path: `${B}/t 2/Czechoslovak Artillery/Logistics Weapons & Ammunition.pdf` }]}]},
+    { id: "art-05a", group: "art-tape", title: "Tape 5 Side 1 — Training/Tactics", tapeLabel: "Tape 05A", tag: "Tactics", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 05 Side 1.mp3`, audioLabel: "Artillery Tape 05 Side 1", sections: [{ type: "intro", text: "Artillery training and tactics: fire support, deployment, defensive positions." }, { type: "pdfs", files: [{ label: "Training and Tactics 01", path: `${B}/t 2/Czechoslovak Artillery/Training and Tactics 01.pdf` }, { label: "Training and Tactics", path: `${B}/t 2/Czechoslovak Artillery/Training and Tactics.pdf` }]}]},
+    { id: "art-05b", group: "art-tape", title: "Tape 5 Side 2", tapeLabel: "Tape 05B", tag: "Tactics", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 05 Side 2.mp3`, audioLabel: "Artillery Tape 05 Side 2", sections: [{ type: "intro", text: "Continued tactics and training." }, { type: "pdfs", files: [{ label: "Training and Tactics", path: `${B}/t 2/Czechoslovak Artillery/Training and Tactics.pdf` }]}]},
+    { id: "art-06a", group: "art-tape", title: "Tape 6 Side 1", tapeLabel: "Tape 06A", tag: "Air Defense", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 06 Side 1.mp3`, audioLabel: "Artillery Tape 06 Side 1", sections: [{ type: "intro", text: "Air defense systems integrated with artillery." }, { type: "pdfs", files: [{ label: "Air Defense", path: `${B}/t 2/Czechoslovak Artillery/Air Defense.pdf` }]}]},
+    { id: "art-06b", group: "art-tape", title: "Tape 6 Side 2", tapeLabel: "Tape 06B", tag: "Air Defense", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 06 Side 2.mp3`, audioLabel: "Artillery Tape 06 Side 2", sections: [{ type: "intro", text: "Air defense operations and reporting." }, { type: "pdfs", files: [{ label: "Air Defense", path: `${B}/t 2/Czechoslovak Artillery/Air Defense.pdf` }]}]},
+    { id: "art-07a", group: "art-tape", title: "Tape 7 Side 1", tapeLabel: "Tape 07A", tag: "Review", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 07 Side 1.mp3`, audioLabel: "Artillery Tape 07 Side 1", sections: [{ type: "intro", text: "Review and consolidation: mixed scenarios." }, { type: "pdfs", files: [{ label: "Job Aid (quick reference)", path: `${B}/t 2/Czechoslovak Artillery/Job Aid.pdf` }]}]},
+    { id: "art-07b", group: "art-tape", title: "Tape 7 Side 2", tapeLabel: "Tape 07B", tag: "Review", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 07 Side 2.mp3`, audioLabel: "Artillery Tape 07 Side 2", sections: [{ type: "intro", text: "Continued review." }, { type: "pdfs", files: [{ label: "Job Aid", path: `${B}/t 2/Czechoslovak Artillery/Job Aid.pdf` }]}]},
+    { id: "art-08a", group: "art-tape", title: "Tape 8 Side 1", tapeLabel: "Tape 08A", tag: "Advanced", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 08 Side 1.mp3`, audioLabel: "Artillery Tape 08 Side 1", sections: [{ type: "intro", text: "Advanced artillery scenarios." }, { type: "pdfs", files: [{ label: "Czechoslovak Artillery", path: `${B}/t 2/Czechoslovak Artillery/Czechoslovak Artillery.pdf` }]}]},
+    { id: "art-08b", group: "art-tape", title: "Tape 8 Side 2", tapeLabel: "Tape 08B", tag: "Advanced", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 08 Side 2.mp3`, audioLabel: "Artillery Tape 08 Side 2", sections: [{ type: "intro", text: "Advanced artillery scenarios continued." }, { type: "pdfs", files: [{ label: "Czechoslovak Artillery", path: `${B}/t 2/Czechoslovak Artillery/Czechoslovak Artillery.pdf` }]}]},
+    { id: "art-09a", group: "art-tape", title: "Tape 9 Side 1", tapeLabel: "Tape 09A", tag: "Final", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 09 Side 1.mp3`, audioLabel: "Artillery Tape 09 Side 1", sections: [{ type: "intro", text: "Final course content." }, { type: "pdfs", files: [{ label: "Job Aid", path: `${B}/t 2/Czechoslovak Artillery/Job Aid.pdf` }]}]},
+    { id: "art-09b", group: "art-tape", title: "Tape 9 Side 2", tapeLabel: "Tape 09B", tag: "Final", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 09 Side 2.mp3`, audioLabel: "Artillery Tape 09 Side 2", sections: [{ type: "intro", text: "Final course content continued." }, { type: "pdfs", files: [{ label: "Job Aid", path: `${B}/t 2/Czechoslovak Artillery/Job Aid.pdf` }]}]},
+    { id: "art-10a", group: "art-tape", title: "Tape 10 Side 1", tapeLabel: "Tape 10A", tag: "Final", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 10 Side 1.mp3`, audioLabel: "Artillery Tape 10 Side 1", sections: [{ type: "intro", text: "Course completion tape." }, { type: "pdfs", files: [{ label: "Course Manual", path: `${B}/t 2/Czechoslovak Artillery/Course Manual.pdf` }]}]},
+    { id: "art-10b", group: "art-tape", title: "Tape 10 Side 2", tapeLabel: "Tape 10B", tag: "Final", audio: `${B}/t 2/Czechoslovak Artillery MP3/Tape 10 Side 2.mp3`, audioLabel: "Artillery Tape 10 Side 2", sections: [{ type: "intro", text: "Course completion tape continued." }, { type: "pdfs", files: [{ label: "Course Manual", path: `${B}/t 2/Czechoslovak Artillery/Course Manual.pdf` }]}]},
+  ]
+},
+
+// ────────────────────────────────────────────────────────────────────────────
+// 4. CZECHOSLOVAK MOTORIZED RIFLE TROOPS
+// ────────────────────────────────────────────────────────────────────────────
+{
+  id: "motorized",
+  title: "Czechoslovak Motorized Rifle Troops",
+  description: "Specialist course. 24 lessons. Rifle troop composition, missions, tactics.",
+  color: "#4a5a1a",
+  groups: [
+    { id: "mrt-tape", label: "Lessons 1–24", defaultOpen: true },
+  ],
+  units: [
+    { id: "mrt-01", group: "mrt-tape", title: "Lesson 1: Composition & Organization", tapeLabel: "Tape 01", tag: "Composition", audio: `${B}/t 2/Czechoslovak Motorized Rifle Troops MP3/Tape 01 Less 01.mp3`, audioLabel: "MRT Tape 01 — Lesson 1", sections: [{ type: "intro", text: "Introduction to Czechoslovak Motorized Rifle Troops. Lesson 1: Unit composition and organizational structure." }, { type: "pdfs", files: [{ label: "Composition — Organization", path: `${B}/t 2/Czechoslovak Motorized Rifle Troops/Composition-Organization.pdf` }, { label: "Job Aid", path: `${B}/t 2/Czechoslovak Motorized Rifle Troops/Job Aid.pdf` }]}]},
+    { id: "mrt-02", group: "mrt-tape", title: "Lesson 2: Weapons & Equipment", tapeLabel: "Tape 02", tag: "Weapons", audio: `${B}/t 2/Czechoslovak Motorized Rifle Troops MP3/Tape 02 Less 02.mp3`, audioLabel: "MRT Tape 02 — Lesson 2", sections: [{ type: "intro", text: "Weapons and equipment of motorized rifle units." }, { type: "pdfs", files: [{ label: "Composition — Weapons & Equipment", path: `${B}/t 2/Czechoslovak Motorized Rifle Troops/Composition-Weapons & Equipment.pdf` }]}]},
+    { id: "mrt-03", group: "mrt-tape", title: "Lesson 3: Weapons & Equipment (2)", tapeLabel: "Tape 03", tag: "Weapons", audio: `${B}/t 2/Czechoslovak Motorized Rifle Troops MP3/Tape 03 Less 03.mp3`, audioLabel: "MRT Tape 03 — Lesson 3", sections: [{ type: "intro", text: "Additional weapons and equipment." }, { type: "pdfs", files: [{ label: "Weapons & Equipment 01", path: `${B}/t 2/Czechoslovak Motorized Rifle Troops/Composition-Weapons & Equipment 01.pdf` }, { label: "Weapons & Equipment 02", path: `${B}/t 2/Czechoslovak Motorized Rifle Troops/Composition-Weapons & Equipment 02.pdf` }]}]},
+    { id: "mrt-04", group: "mrt-tape", title: "Lesson 4: Map & Tracking", tapeLabel: "Tape 04", tag: "Disposition", audio: `${B}/t 2/Czechoslovak Motorized Rifle Troops MP3/Tape 04 Less 04.mp3`, audioLabel: "MRT Tape 04 — Lesson 4", sections: [{ type: "intro", text: "Disposition reporting: map reading, unit tracking, position reports." }, { type: "pdfs", files: [{ label: "Disposition — Map Tracking", path: `${B}/t 2/Czechoslovak Motorized Rifle Troops/Disposition-Map Tracking 01.pdf` }]}]},
+    { id: "mrt-05", group: "mrt-tape", title: "Lesson 5: Mission", tapeLabel: "Tape 05", tag: "Mission", audio: `${B}/t 2/Czechoslovak Motorized Rifle Troops MP3/Tape 05 Less 05.mp3`, audioLabel: "MRT Tape 05 — Lesson 5", sections: [{ type: "intro", text: "Mission reporting for rifle troops." }, { type: "pdfs", files: [{ label: "Planning & Preparation", path: `${B}/t 2/Czechoslovak Motorized Rifle Troops/Planning & Preparation.pdf` }]}]},
+    ...[6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].map(n => ({
+      id: `mrt-${String(n).padStart(2,"0")}`, group: "mrt-tape",
+      title: `Lesson ${n}`,
+      tapeLabel: `Tape ${String(n).padStart(2,"0")}`,
+      tag: "MRT",
+      audio: `${B}/t 2/Czechoslovak Motorized Rifle Troops MP3/Tape ${String(n).padStart(2,"0")} Less ${String(n).padStart(2,"0")}.mp3`,
+      audioLabel: `MRT Tape ${String(n).padStart(2,"0")} — Lesson ${n}`,
+      sections: [
+        { type: "intro", text: `Lesson ${n} of the Motorized Rifle Troops specialist course. Topics vary: logistics, tactics, strength reporting, and operational scenarios.` },
+        { type: "pdfs", files: [
+          { label: "Planning & Preparation", path: `${B}/t 2/Czechoslovak Motorized Rifle Troops/Planning & Preparation.pdf` },
+          { label: "Job Aid", path: `${B}/t 2/Czechoslovak Motorized Rifle Troops/Job Aid.pdf` },
+        ]},
+      ]
+    }))
+  ]
+},
+
+// ────────────────────────────────────────────────────────────────────────────
+// 5. CZECHOSLOVAK TANK TROOPS
+// ────────────────────────────────────────────────────────────────────────────
+{
+  id: "tank",
+  title: "Czechoslovak Tank Troops",
+  description: "Specialist course. 7 tapes covering 10 lessons. Tank unit composition, weapons, tactics.",
+  color: "#3a3a6a",
+  groups: [
+    { id: "tank-tape", label: "Tank Troops Lessons 1–10", defaultOpen: true },
+  ],
+  units: [
+    { id: "tk-01", group: "tank-tape", title: "Lessons 1–2: Mission & Composition", tapeLabel: "Tape 01", tag: "CTT Lessons 1–2", audio: `${B}/t 2/Czechoslovak Tank Troops MP3/Tape 01 Less 01-02 CTT, M.mp3`, audioLabel: "Tank Troops Tape 01 — Lessons 1–2", sections: [{ type: "intro", text: "Introduction to Czechoslovak Tank Troops (CTT). Lessons 1–2: Mission of tank troops and organizational composition." }, { type: "pdfs", files: [{ label: "Composition, Organization & Strength", path: `${B}/t 2/Czechoslovak Tank Troops/Composition Qrganization and Strength.pdf` }]}]},
+    { id: "tk-02", group: "tank-tape", title: "Lessons 3–4: Organization, Weapons", tapeLabel: "Tape 02", tag: "COS, CWE Lessons 3–4", audio: `${B}/t 2/Czechoslovak Tank Troops MP3/Tape 02 Less 03-04 COS, CWE.mp3`, audioLabel: "Tank Troops Tape 02 — Lessons 3–4", sections: [{ type: "intro", text: "Lessons 3–4: Detailed organizational charts (COS) and weapons/equipment inventory (CWE-1)." }, { type: "pdfs", files: [{ label: "Composition — Weapons & Equipment 01", path: `${B}/t 2/Czechoslovak Tank Troops/Composition-Weapons & Equipment 01.pdf` }, { label: "Composition — Weapons & Equipment 02", path: `${B}/t 2/Czechoslovak Tank Troops/Composition-Weapons & Equipment 02.pdf` }]}]},
+    { id: "tk-03", group: "tank-tape", title: "Lesson 5: Weapons & Equipment (2)", tapeLabel: "Tape 03", tag: "CWE-2 Lesson 5", audio: `${B}/t 2/Czechoslovak Tank Troops MP3/Tape 03 Less 05 CWE-2.mp3`, audioLabel: "Tank Troops Tape 03 — Lesson 5", sections: [{ type: "intro", text: "Lesson 5: Continued weapons and equipment — secondary weapons, communications gear." }, { type: "pdfs", files: [{ label: "Composition — Weapons & Equipment 02", path: `${B}/t 2/Czechoslovak Tank Troops/Composition-Weapons & Equipment 02.pdf` }, { label: "Composition — Weapons & Equipment 03", path: `${B}/t 2/Czechoslovak Tank Troops/Composition - Weapons & Equipment 03.pdf` }]}]},
+    { id: "tk-04", group: "tank-tape", title: "Lessons 6: Weapons (3) & Logistics", tapeLabel: "Tape 04", tag: "CWE-3, LCE Lesson 6", audio: `${B}/t 2/Czechoslovak Tank Troops MP3/Tape 04 Less 06 CWE-3, LCE.mp3`, audioLabel: "Tank Troops Tape 04 — Lesson 6", sections: [{ type: "intro", text: "Lesson 6: Final weapons inventory and logistics — communications equipment (LCE)." }, { type: "pdfs", files: [{ label: "Composition — Weapons & Equipment 03", path: `${B}/t 2/Czechoslovak Tank Troops/Composition - Weapons & Equipment 03.pdf` }]}]},
+    { id: "tk-05", group: "tank-tape", title: "Lessons 7–8: Logistics (Weapons, Food)", tapeLabel: "Tape 05", tag: "LWA, LF Lessons 7–8", audio: `${B}/t 2/Czechoslovak Tank Troops MP3/Tape 05 Less 07-08  LWA, LF.mp3`, audioLabel: "Tank Troops Tape 05 — Lessons 7–8", sections: [{ type: "intro", text: "Lessons 7–8: Logistics — weapons and ammunition (LWA) and food/water supply (LF)." }, { type: "pdfs", files: [{ label: "Logistics — Weapons & Ammo", path: `${B}/t 2/Czechoslovak Tank Troops/Logistics-Weapons & Ammunitions.pdf` }, { label: "Logistics — Food & Water", path: `${B}/t 2/Czechoslovak Tank Troops/Logistics-Food & Water.pdf` }]}]},
+    { id: "tk-06", group: "tank-tape", title: "Lesson 9: Training & Tactics (1)", tapeLabel: "Tape 06", tag: "TT-1 Lesson 9", audio: `${B}/t 2/Czechoslovak Tank Troops MP3/Tape 06 Less  09 TT-1.mp3`, audioLabel: "Tank Troops Tape 06 — Lesson 9", sections: [{ type: "intro", text: "Lesson 9: Training and tactics of tank troops — offensive operations, attack formations." }, { type: "pdfs", files: [{ label: "Training and Tactics 01", path: `${B}/t 2/Czechoslovak Tank Troops/Training and Tactics - 01.pdf` }]}]},
+    { id: "tk-07", group: "tank-tape", title: "Lesson 10: Training & Tactics (2)", tapeLabel: "Tape 07", tag: "TT-2 Lesson 10", audio: `${B}/t 2/Czechoslovak Tank Troops MP3/Tape 07 Less 10  TT-2.mp3`, audioLabel: "Tank Troops Tape 07 — Lesson 10", sections: [{ type: "intro", text: "Lesson 10: Defensive operations, withdrawal, coordination with artillery and infantry." }, { type: "pdfs", files: [{ label: "Training and Tactics 02", path: `${B}/t 2/Czechoslovak Tank Troops/Training and Tactics - 02.pdf` }]}]},
+  ]
+},
+
+// ────────────────────────────────────────────────────────────────────────────
+// 6. CZECHOSLOVAK RIFLE TROOPS (bonus course found in t 2/)
+// ────────────────────────────────────────────────────────────────────────────
+{
+  id: "rifle",
+  title: "Czechoslovak Rifle Troops",
+  description: "Reference PDFs only — no dedicated audio tapes. Supplementary to MRT course.",
+  color: "#5a3a6a",
+  units: [
+    { id: "rf-01", title: "Course Manual & All Reference PDFs", tapeLabel: "",
+      tag: "Reference", audio: `${B}/t 2/Czechoslovak Motorized Rifle Troops MP3/Tape 01 Less 01.mp3`,
+      audioLabel: "MRT Tape 01 (use as reference audio)",
+      sections: [
+        { type: "intro", text: "Czechoslovak Rifle Troops reference materials. No dedicated audio for this sub-course — use alongside Motorized Rifle Troops tapes." },
+        { type: "pdfs", files: [
+          { label: "Course Manual", path: `${B}/t 2/Czechoslovak Rifle Troops/Course Manual.pdf` },
+          { label: "Mission", path: `${B}/t 2/Czechoslovak Rifle Troops/Mission.pdf` },
+          { label: "Logistics — Communications Equipment", path: `${B}/t 2/Czechoslovak Rifle Troops/Logistics Communications Equipment.pdf` },
+          { label: "Logistics — Food & Water", path: `${B}/t 2/Czechoslovak Rifle Troops/Logistics-Food & Water.pdf` },
+          { label: "Logistics — Medical", path: `${B}/t 2/Czechoslovak Rifle Troops/Logistics-Medical.pdf` },
+          { label: "Logistics — NBC", path: `${B}/t 2/Czechoslovak Rifle Troops/Logistics-Nuclear Biological & Chemical.pdf` },
+          { label: "Logistics — Vehicles/POL", path: `${B}/t 2/Czechoslovak Rifle Troops/Logistics-Vehicles,Pertoleum,Oil & Lubricants.pdf` },
+          { label: "Logistics — Weapons & Ammo", path: `${B}/t 2/Czechoslovak Rifle Troops/Logistics-Weapons & Ammunitions.pdf` },
+          { label: "Miscellaneous — Losses & Replacements", path: `${B}/t 2/Czechoslovak Rifle Troops/Miscellaneous Losses and Replacements.pdf` },
+          { label: "Miscellaneous — Callsigns & Frequencies", path: `${B}/t 2/Czechoslovak Rifle Troops/Miscellaneous-Callsigns,Frequencies, & Passwords.pdf` },
+          { label: "Miscellaneous — Obstacles", path: `${B}/t 2/Czechoslovak Rifle Troops/Miscellaneous-Obstacles.pdf` },
+          { label: "Miscellaneous — Tactics & Training 01", path: `${B}/t 2/Czechoslovak Rifle Troops/Miscellaneous-Tactics & Training 01.pdf` },
+          { label: "Miscellaneous — Tactics & Training 02", path: `${B}/t 2/Czechoslovak Rifle Troops/Miscellaneous-Tactics & Training 02.pdf` },
+          { label: "Miscellaneous — Tactics & Training 03", path: `${B}/t 2/Czechoslovak Rifle Troops/Miscellaneous-Tactics & Training 03.pdf` },
+          { label: "Termination of Interrogation", path: `${B}/t 2/Czechoslovak Rifle Troops/Termination of Interrogation.pdf` },
+        ]},
+      ]
+    },
+  ]
+},
+
+]; // end COURSES
+</script>
+</body>
+</html>

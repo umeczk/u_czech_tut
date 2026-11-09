@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Czech Hub — Learn Czech & Explore Properties</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #1d6fa4;
+      --primary-dark: #155a87;
+      --accent: #d7000c; /* Czech flag red */
+      --bg: #f8fafc;
+      --white: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06);
+      --shadow-hover: 0 8px 24px rgba(0,0,0,0.14), 0 20px 48px rgba(0,0,0,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* NAV */
+    nav { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; }
+    .nav-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; height: 64px; gap: 12px; }
+    .flag { font-size: 24px; }
+    .nav-logo { font-size: 20px; font-weight: 800; color: var(--primary); }
+    .nav-logo span { color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #1d4166 0%, #1d6fa4 60%, #2a8fd1 100%);
+      color: white;
+      text-align: center;
+      padding: 72px 24px 80px;
+    }
+    .hero-flag { font-size: 56px; margin-bottom: 16px; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900; letter-spacing: -0.5px; margin-bottom: 16px; }
+    .hero h1 span { color: #7fd4ff; }
+    .hero p { font-size: 1.1rem; opacity: 0.85; max-width: 520px; margin: 0 auto 8px; }
+    .hero-sub { font-size: 0.9rem; opacity: 0.6; margin-top: 4px; }
+
+    /* CARDS */
+    .cards-section { max-width: 900px; margin: -40px auto 0; padding: 0 24px 80px; }
+    .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 640px) { .cards { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 36px 32px 32px;
+      display: flex; flex-direction: column; gap: 16px;
+      transition: box-shadow 0.2s, transform 0.2s;
+      text-decoration: none; color: inherit;
+    }
+    .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); }
+
+    .card-icon { font-size: 48px; }
+    .card-tag {
+      display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+      text-transform: uppercase; padding: 3px 10px; border-radius: 20px;
+      background: #e8f4fd; color: var(--primary); width: fit-content;
+    }
+    .card-tag.red { background: #fff0f0; color: var(--accent); }
+    .card h2 { font-size: 1.4rem; font-weight: 800; }
+    .card p { color: var(--muted); font-size: 0.95rem; line-height: 1.6; flex: 1; }
+    .card-features { display: flex; flex-direction: column; gap: 8px; }
+    .feature { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--muted); }
+    .feature-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
+    .feature-dot.red { background: var(--accent); }
+    .card-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--primary); color: white;
+      padding: 12px 20px; border-radius: 10px;
+      font-size: 14px; font-weight: 600; width: fit-content;
+      transition: background 0.2s;
+    }
+    .card-btn.red { background: var(--accent); }
+    .card:hover .card-btn { background: var(--primary-dark); }
+    .card:hover .card-btn.red { background: #a8000a; }
+
+    /* FOOTER */
+    footer { margin-top: auto; background: var(--white); border-top: 1px solid var(--border); padding: 24px; text-align: center; color: var(--muted); font-size: 0.85rem; }
+    footer a { color: var(--primary); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <span class="flag">🇨🇿</span>
+      <span class="nav-logo">Czech<span>Hub</span></span>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-flag">🇨🇿</div>
+    <h1>Your <span>Czech</span> Gateway</h1>
+    <p>Learn the Czech language or explore affordable properties — all in one place.</p>
+    <p class="hero-sub">Naučte se česky · Najděte nemovitost</p>
+  </div>
+
+  <section class="cards-section">
+    <div class="cards">
+
+      <a href="learn.html" class="card">
+        <div class="card-icon">📚</div>
+        <span class="card-tag">Language Learning</span>
+        <h2>Learn Czech</h2>
+        <p>Complete DLI Czech course library — structured lessons from basic to advanced, with audio and exercises.</p>
+        <div class="card-features">
+          <div class="feature"><div class="feature-dot"></div>DLI Basic, Military & Improvement courses</div>
+          <div class="feature"><div class="feature-dot"></div>Audio lessons with transcripts</div>
+          <div class="feature"><div class="feature-dot"></div>Track your progress</div>
+        </div>
+        <span class="card-btn">Start Learning →</span>
+      </a>
+
+      <a href="property.html" class="card">
+        <div class="card-icon">🏡</div>
+        <span class="card-tag red">Property Search</span>
+        <h2>Find Property in Czech Republic</h2>
+        <p>Browse curated properties under 5M CZK with investment scoring — bilingual EN/CS support.</p>
+        <div class="card-features">
+          <div class="feature"><div class="feature-dot red"></div>Properties under 5M CZK</div>
+          <div class="feature"><div class="feature-dot red"></div>Investment score & analysis</div>
+          <div class="feature"><div class="feature-dot red"></div>English & Czech interface</div>
+        </div>
+        <span class="card-btn red">Browse Properties →</span>
+      </a>
+
+    </div>
+  </section>
+
+  <footer>
+    Built with ❤️ for Czech learners &amp; explorers · <a href="mailto:umesh_ban_2000@gmail.com">Contact</a>
+  </footer>
+
+</body>
+</html>
