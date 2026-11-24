@@ -135,6 +135,41 @@ header .subtitle { font-size: 0.75rem; opacity: 0.7; }
 
 /* Loading state */
 .loading { padding: 30px; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+/* Teacher note box */
+.teacher-note { background: #fffbea; border-left: 4px solid #f5a623; border-radius: 0 6px 6px 0; padding: 10px 14px; font-size: 0.82rem; line-height: 1.65; color: #3a2a00; }
+.teacher-note strong { color: #b05a00; }
+/* Analogy box */
+.analogy-box { background: #f0f7ff; border: 1px solid #b8d4f0; border-radius: 6px; padding: 10px 14px; font-size: 0.82rem; line-height: 1.65; }
+.analogy-box .lang-tag { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #2a5f8a; background: #d6eaf8; padding: 1px 7px; border-radius: 10px; margin-right: 6px; }
+/* Sound box */
+.sound-box { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0; }
+.sound-pill { background: #fff; border: 1.5px solid #d0c8b8; border-radius: 6px; padding: 6px 12px; font-size: 0.82rem; text-align: center; min-width: 90px; }
+.sound-pill .cz { font-size: 1.1rem; font-weight: 700; color: #1d4166; }
+.sound-pill .like { font-size: 0.7rem; color: #888; margin-top: 2px; }
+.sound-pill .example { font-size: 0.72rem; color: #555; }
+/* Visual scene */
+.scene { background: #1d4166; color: #e8f4ff; border-radius: 8px; padding: 14px 18px; font-family: monospace; font-size: 0.82rem; line-height: 1.6; white-space: pre; overflow-x: auto; margin-top: 10px; }
+.scene .label { color: #7fd4ff; font-weight: 700; }
+/* Berlitz picture sentence */
+.berlitz-row { display: flex; align-items: flex-start; gap: 14px; padding: 8px 0; border-bottom: 1px solid #f0ece4; }
+.berlitz-row:last-child { border-bottom: none; }
+.berlitz-pic { font-size: 2.2rem; flex-shrink: 0; width: 44px; text-align: center; }
+.berlitz-cz { font-size: 1rem; font-weight: 700; color: #1d4166; }
+.berlitz-en { font-size: 0.8rem; color: #666; margin-top: 2px; }
+.berlitz-note { font-size: 0.75rem; color: #b05a00; margin-top: 3px; font-style: italic; }
+/* Gender colour badges */
+.g-m { color: #fff; background: #2a5f8a; padding: 1px 7px; border-radius: 10px; font-size: 0.68rem; font-weight: 700; }
+.g-f { color: #fff; background: #a0366a; padding: 1px 7px; border-radius: 10px; font-size: 0.68rem; font-weight: 700; }
+.g-n { color: #fff; background: #3d6b3d; padding: 1px 7px; border-radius: 10px; font-size: 0.68rem; font-weight: 700; }
+/* Stress marker */
+.stress { text-decoration: underline; text-decoration-color: #f5a623; text-underline-offset: 3px; }
+/* Minimal quiz strip */
+.quiz-strip { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.quiz-q { padding: 9px 14px; font-size: 0.82rem; font-weight: 600; background: #f9f8f5; }
+.quiz-a { padding: 9px 14px; font-size: 0.82rem; color: #666; display: none; border-top: 1px solid var(--border); background: #fff; }
+.quiz-btn { padding: 4px 12px; font-size: 0.72rem; border: 1px solid var(--accent); color: var(--accent); background: none; border-radius: 4px; cursor: pointer; margin: 6px 14px; }
+.quiz-btn:hover { background: var(--active-bg); }
 </style>
 </head>
 <body>
@@ -231,6 +266,31 @@ function renderSection(sec, scroll) {
   } else if (sec.type === "pdfs") {
     // PDF links are local-only, skip on web
     return;
+  } else if (sec.type === "teacher") {
+    const c = mkCard(sec.title || "Teacher's Note");
+    c.querySelector(".card-body").innerHTML = sec.html;
+    scroll.appendChild(c);
+  } else if (sec.type === "berlitz") {
+    const c = mkCard(sec.title || "Picture It");
+    const rows = (sec.items || []).map(it =>
+      `<div class="berlitz-row"><div class="berlitz-pic">${it.pic}</div><div><div class="berlitz-cz">${it.cz}</div><div class="berlitz-en">${it.en}</div>${it.note ? `<div class="berlitz-note">${it.note}</div>` : ''}</div></div>`
+    ).join('');
+    c.querySelector(".card-body").innerHTML = rows;
+    scroll.appendChild(c);
+  } else if (sec.type === "sounds") {
+    const c = mkCard(sec.title || "Pronunciation Guide");
+    const pills = (sec.items || []).map(it =>
+      `<div class="sound-pill"><div class="cz">${it.letter}</div><div class="like">${it.like}</div><div class="example">${it.example}</div></div>`
+    ).join('');
+    c.querySelector(".card-body").innerHTML = `<div class="sound-box">${pills}</div>`;
+    scroll.appendChild(c);
+  } else if (sec.type === "quiz") {
+    const c = mkCard(sec.title || "Quick Check");
+    const items = (sec.items || []).map((it,i) =>
+      `<div class="quiz-strip"><div class="quiz-q">${i+1}. ${it.q}</div><button class="quiz-btn" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">Show answer</button><div class="quiz-a">${it.a}</div></div>`
+    ).join('');
+    c.querySelector(".card-body").innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">${items}</div>`;
+    scroll.appendChild(c);
   }
 }
 
@@ -392,7 +452,28 @@ const COURSES = [
     audio: `${DLG}/Tape 01 Vol 01 Less 01-03 .mp3`,
     audioLabel: "Tape 01 — Lessons 1–3 (Dialogues)",
     sections: [
-      { type: "intro", text: "<strong>Focus:</strong> Pronunciation of short vowels, unaspirated stops (p, t, k), basic intonation. Czech stress always falls on the <em>first syllable</em>. No articles in Czech." },
+      { type: "teacher", title: "Welcome — Your First Czech Words", html: `
+        <div class="teacher-note">
+          <strong>Dear student</strong> — Welcome! You speak Hindi. That means you already know something magical: in Hindi you say <em>यह क्या है?</em> (Yah kya hai?) — "What is this?" In Czech we say <strong>Co je to?</strong> (Tso yeh toh). Same meaning. Same 3-word shape. That is your first bridge. Czech is not as far as you think.
+        </div>
+        <div class="analogy-box" style="margin-top:10px">
+          <span class="lang-tag">Hindi bridge</span> <strong>यह क्या है?</strong> → <strong>Co je to?</strong> — both mean "What is this?" and both have exactly 3 words.<br>
+          <span class="lang-tag">English note</span> Czech has <strong>no articles</strong> — no "a" or "the". Just like Hindi has no articles. <em>To je mapa</em> = "This is map" (the/a map — context tells you).
+        </div>` },
+      { type: "sounds", title: "Czech Letters You Meet Today", items: [
+        { letter: "C", like: "ts (like 'bits')", example: "Co = tso" },
+        { letter: "J", like: "y (like 'yes')", example: "je = yeh" },
+        { letter: "Á", like: "longer aa", example: "mapa = MA-pa" },
+        { letter: "Stress", like: "ALWAYS 1st syllable", example: "MA-pa, TA-dy, ZHI-dle" },
+      ]},
+      { type: "berlitz", title: "Picture It — The Classroom", items: [
+        { pic: "🗺️", cz: "To je mapa.", en: "This is a map.", note: "Point at any map and say this. Czech stress: MA-pa." },
+        { pic: "🪟", cz: "To je okno.", en: "This is a window.", note: "OK-no — the stress is on OK." },
+        { pic: "✏️", cz: "To je tužka.", en: "This is a pencil.", note: "TUZH-ka — ž sounds like the 's' in 'measure'." },
+        { pic: "🪑", cz: "To je židle.", en: "This is a chair.", note: "ZHID-leh — ž again like 'measure'." },
+        { pic: "🏫", cz: "Kde je pošta?", en: "Where is the post office?", note: "Kde = kdeh. The kd- cluster: say k then d fast." },
+        { pic: "📬", cz: "Pošta je tam.", en: "The post office is there.", note: "tam = there. tady = here. Easy pair!" },
+      ]},
       { type: "dialogue", title: "Dialogue — Co je to? (What is this?)", rows: [
         ["1","Co je to?","What is this?"],
         ["","To je mapa.","This is a map."],
@@ -420,13 +501,26 @@ const COURSES = [
         ["mapa","f.","map"],["okno","n.","window"],["student","m.","student"],
         ["letec","m.","airman"],["tužka","f.","pencil"],["židle","f.","chair"],
         ["koš","m.","basket"],["tabule","f.","blackboard"],["pošta","f.","post office"],
-        ["pan","m.","Mr. / sir (proclitic — unstressed)"],
       ]},
-      { type: "grammar", title: "Grammar: Word Order & Copula", html: `<p>Questions are formed by intonation alone: <code>To je mapa?</code> (rising pitch) = "Is this a map?"</p><p><strong>No articles:</strong> <em>letec</em> = "an airman" or "the airman" — context tells you which.</p><p>Word stress falls on the <strong>first syllable</strong> always: <code>MA-pa</code>, <code>TAM</code>, <code>TA-dy</code>.</p>` },
+      { type: "teacher", title: "Gender — Your Biggest New Idea", html: `
+        <div class="teacher-note">
+          Czech nouns are <strong>masculine, feminine, or neuter</strong>. Hindi has this too! <em>लड़का</em> (ladka) is masculine, <em>लड़की</em> (ladki) is feminine. In Czech the ending usually tells you:<br><br>
+          <strong>Masculine</strong> <span class="g-m">M</span> — ends in a consonant: <em>koš, student, letec</em><br>
+          <strong>Feminine</strong> <span class="g-f">F</span> — ends in <strong>-a</strong> or <strong>-e</strong>: <em>mapa, tužka, židle</em><br>
+          <strong>Neuter</strong> <span class="g-n">N</span> — ends in <strong>-o</strong> or <strong>-í</strong>: <em>okno</em><br><br>
+          You will use gender every time you say "that" or use an adjective. Learn the gender with the word, not separately.
+        </div>` },
+      { type: "grammar", title: "Grammar: Questions by Intonation Only", html: `<p>Czech forms yes/no questions with <strong>rising intonation only</strong> — no word order change, no "do":<br><code>To je mapa.</code> (falling) = It is a map.<br><code>To je mapa?</code> (rising) = Is it a map?</p><p>Just like Hindi: <em>यह मेज है।</em> vs <em>यह मेज है?</em> — same words, different tone.</p><p><strong>No articles ever.</strong> <em>To je student</em> = "He is a/the student."</p>` },
       { type: "drills", title: "Pattern Drills", items: [
         { prompt: "Co je tady?", answer: "Tady je mapa. / Tady je tužka. / Tady je tabule." },
         { prompt: "Kdo je tady?", answer: "Tady je student. / Tady je letec." },
         { prompt: "Je pan Svoboda student?", answer: "Ano, pan Svoboda je student." },
+      ]},
+      { type: "quiz", title: "Quick Check", items: [
+        { q: "How do you say 'What is this?' in Czech?", a: "Co je to? (tso yeh toh)" },
+        { q: "What gender is 'mapa' (map)?", a: "Feminine — it ends in -a" },
+        { q: "Where does stress fall in Czech words?", a: "Always on the FIRST syllable: MA-pa, TA-dy, OK-no" },
+        { q: "How do you make a yes/no question in Czech?", a: "Rising intonation only — no word order change" },
       ]},
       { type: "pdfs", files: [
         { label: "Pronunciation Dialogues", pages: "pp. 1–16", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
@@ -443,7 +537,26 @@ const COURSES = [
     audio: `${DLG}/Tape 02 Vol 01 Less 04-05.mp3`,
     audioLabel: "Tape 02 — Lessons 4–5",
     sections: [
-      { type: "intro", text: "<strong>Focus:</strong> New environment vocabulary (home, outside, distance, weather). Contrast word <em>ale</em> (but). Cluster /sj/." },
+      { type: "teacher", title: "New Setting: Home, Outside, Weather", html: `
+        <div class="teacher-note">
+          Today we move from the classroom to the world outside. You will learn to talk about where things are (<em>doma</em> = at home, <em>venku</em> = outside) and what the weather is like. These are survival words — you will use them every day.<br><br>
+          <strong>New key word: ale</strong> (but) — same function as Hindi <em>लेकिन</em> (lekin). "But it is warm here" = <em>Ale tady je teplo.</em>
+        </div>` },
+      { type: "berlitz", title: "Picture It — Home and Outside", items: [
+        { pic: "🏠", cz: "Teta je doma.", en: "Aunt is at home.", note: "doma = at home (never changes — it's an adverb, not a noun)" },
+        { pic: "🚲", cz: "Kolo je venku.", en: "The bike is outside.", note: "venku = outside. kolo = bike (also means 'wheel' or 'circle')" },
+        { pic: "🍺", cz: "To je pivo.", en: "This is a beer.", note: "pivo ends in -o → neuter gender" },
+        { pic: "✉️", cz: "Tady je dopis.", en: "Here is a letter.", note: "dopis = letter (the written kind). do (into) + pis (write) — word family!" },
+        { pic: "🛩️", cz: "Venku je letadlo.", en: "Outside is an airplane.", note: "letadlo = airplane. letec = airman. Both from letět (to fly). Your first Czech word family!" },
+        { pic: "🥶", cz: "Venku je zima.", en: "It is cold outside.", note: "zima also means 'winter' — in winter it is cold. One word, two meanings." },
+        { pic: "🌡️", cz: "Ale tady je teplo.", en: "But here it is warm.", note: "ale = but. teplo = warmth/warm. moc teplo = very warm." },
+      ]},
+      { type: "teacher", title: "Czech Word Families — Learn 1, Get 3 Free", html: `
+        <div class="analogy-box">
+          <span class="lang-tag">Word family</span> Czech builds words like Hindi does with roots:<br><br>
+          <strong>letět</strong> (to fly) → <strong>letec</strong> (airman) → <strong>letadlo</strong> (airplane) → <strong>letiště</strong> (airport)<br><br>
+          When you learn a root, you get a whole family. Watch for these throughout the course.
+        </div>` },
       { type: "dialogue", title: "Dialogue — Tady je dopis.", rows: [
         ["","Tady je dopis.","Here is a letter."],
         ["1","Je tady dopis?","Is the letter here?"],
@@ -467,13 +580,19 @@ const COURSES = [
         ["pes","m.","dog"],["kolo","n.","bike / wheel"],["venku","","outside"],
         ["tank","m.","tank"],["letadlo","n.","airplane"],["kino","n.","movie theater"],
         ["daleko","","far"],["moc","","very / too much"],["jak","","how"],
-        ["zima","","cold (weather)"],["teplo","","warm (weather)"],["ale","","but"],
+        ["zima","","cold / winter"],["teplo","","warm (weather)"],["ale","","but"],
       ]},
-      { type: "grammar", title: "Grammar: taky & ale", html: `<p><code>taky</code> (also) is flexible in position: <em>Pes je taky doma</em> or <em>Taky pes je doma</em>.</p><p><code>ale</code> (but) connects contrasting clauses: <em>Venku je zima, ale tady je teplo.</em></p><p><strong>Jak je...?</strong> — "How is it...?" is used for weather and conditions.</p>` },
+      { type: "grammar", title: "Grammar: taky, ale and Word Order", html: `<p><code>taky</code> (also) — flexible: <em>Pes je taky doma</em> OR <em>Taky pes je doma</em>. Like Hindi <em>भी</em> (bhi) which can float.</p><p><code>ale</code> (but) always joins two contrasting ideas: <em>Venku je zima, ale tady je teplo.</em></p><p><code>Jak je...?</code> = "How is it...?" — used for weather. <em>Jak je dnes?</em> = How is it today?</p>` },
       { type: "drills", title: "Pattern Drills", items: [
         { prompt: "Venku je tank.", answer: "Venku je letadlo. / Venku je pes. / Venku je kolo." },
         { prompt: "Je kino daleko?", answer: "Ano, kino je moc daleko." },
         { prompt: "Jak je venku?", answer: "Venku je zima. / Venku je teplo." },
+      ]},
+      { type: "quiz", title: "Quick Check", items: [
+        { q: "What is 'at home' in Czech?", a: "doma" },
+        { q: "What does 'moc' mean?", a: "very / too much. Moc daleko = very far." },
+        { q: "What two things does 'zima' mean?", a: "cold (weather) AND winter" },
+        { q: "Translate: 'The dog is also outside.'", a: "Pes je taky venku." },
       ]},
       { type: "pdfs", files: [
         { label: "Pronunciation Dialogues", pages: "pp. 17–28", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
@@ -489,7 +608,38 @@ const COURSES = [
     audio: `${DLG}/Tape 03 Vol 01 Less 06-07.mp3`,
     audioLabel: "Tape 03 — Lessons 6–7",
     sections: [
-      { type: "intro", text: "<strong>Focus:</strong> Long vowels (á, é, í, ó, ú/ů) — these change meaning! Grammatical gender (m./f./n.) and adjective agreement." },
+      { type: "teacher", title: "Long Vowels Change Meaning — Like Hindi Matras!", html: `
+        <div class="teacher-note">
+          This lesson is <strong>critical</strong>. Czech has short and long vowels — just like Hindi! In Hindi, <em>क</em> (ka) vs <em>का</em> (kaa) is a different sound. Czech does the same:<br><br>
+          <strong>a</strong> (short) vs <strong>á</strong> (long, twice as long)<br>
+          <strong>e</strong> vs <strong>é</strong> &nbsp;|&nbsp; <strong>i</strong> vs <strong>í</strong> &nbsp;|&nbsp; <strong>u</strong> vs <strong>ú/ů</strong><br><br>
+          <em>byt</em> = apartment &nbsp;|&nbsp; <em>být</em> = to be — same letters, different length, completely different meaning. Treat the accent mark like a Hindi matra — it changes everything.
+        </div>` },
+      { type: "teacher", title: "Gender Agreement — Adjectives Must Match", html: `
+        <div class="teacher-note">
+          Today you meet <strong>adjective agreement</strong>. In English, adjectives never change: "good map", "good table", "good radio". In Czech they change ending based on gender — like Hindi adjectives!<br><br>
+          Hindi: <em>अच्छा लड़का</em> (masc.) vs <em>अच्छी लड़की</em> (fem.)<br>
+          Czech: <em>dobrý papír</em> <span class="g-m">M</span> vs <em>dobrá mapa</em> <span class="g-f">F</span> vs <em>dobré rádio</em> <span class="g-n">N</span><br><br>
+          The ending of the adjective tells you the gender of the noun it describes.
+        </div>
+        <div class="scene">┌─────────────────────────────────────────────────────┐
+│  ADJECTIVE ENDINGS (basic pattern)                  │
+│                                                     │
+│  MASCULINE  <span class="label">-ý / -í</span>    ten dobrÝ papír  (m)      │
+│  FEMININE   <span class="label">-á</span>         ta dobrÁ mapa    (f)      │
+│  NEUTER     <span class="label">-é / -í</span>    to dobrÉ rádio   (n)      │
+│                                                     │
+│  ten/ta/to = "that" — also shows gender!            │
+└─────────────────────────────────────────────────────┘</div>` },
+      { type: "berlitz", title: "Picture It — Describing Things", items: [
+        { pic: "📄", cz: "Ten papír je dobrý.", en: "That paper is good.", note: "ten = that (masc). dobrý = good (masc ending -ý)" },
+        { pic: "🗺️", cz: "Ta mapa je dobrá.", en: "That map is good.", note: "ta = that (fem). dobrá = good (fem ending -á)" },
+        { pic: "📻", cz: "To rádio je dobré.", en: "That radio is good.", note: "to = that (neut). dobré = good (neut ending -é)" },
+        { pic: "🪑", cz: "Ten stůl je velký.", en: "That table is large.", note: "velký = large (masc). stůl has the ů — long u." },
+        { pic: "🎟️", cz: "Ten lístek je malý.", en: "That ticket is small.", note: "malý = small (masc). Opposite of velký." },
+        { pic: "☕", cz: "Ta káva je dobrá.", en: "That coffee is good.", note: "káva = coffee. The á is long — KAA-va." },
+        { pic: "🥛", cz: "To mléko je špatné.", en: "That milk is bad.", note: "špatné = bad (neut). š = sh sound. Opposite of dobrý." },
+      ]},
       { type: "dialogue", title: "Dialogue — Ten papír je dobrý.", rows: [
         ["","Dobrý den. / Dobrý den.","Hello. / Hello."],
         ["1","Tady je papír. Je ten papír dobrý?","Here is paper. Is that paper good?"],
@@ -512,17 +662,18 @@ const COURSES = [
         ["velký/á/é","m/f/n","big, large"],["malý/á/é","m/f/n","small"],
         ["nový/á/é","m/f/n","new"],["starý/á/é","m/f/n","old"],
         ["ten/ta/to","m/f/n","that (demonstrative)"],
-        ["jaký/á/é","m/f/n","what kind of? what is…like?"],
+        ["jaký/á/é","m/f/n","what kind of?"],
         ["papír","m.","paper"],["stůl","m.","table"],["lístek","m.","ticket/note"],
         ["káva","f.","coffee"],["mléko","n.","milk"],["rádio","n.","radio"],
         ["dobrý den","","good day / hello"],
       ]},
-      { type: "grammar", title: "Grammar: Adjective Gender Agreement", html: `<p>Adjectives agree with their noun in gender:<br>
-<code>Masculine</code>: ten dobrý papír<br>
-<code>Feminine</code>: ta dobrá mapa<br>
-<code>Neuter</code>: to dobré rádio</p>
-<p>The question <code>Jaký/Jaká/Jaké je...?</code> asks "what is ... like?"</p>
-<p><strong>Long vowels change meaning:</strong> <em>byt</em> (apartment) ≠ <em>být</em> (to be). Always pronounce them distinctly longer.</p>` },
+      { type: "grammar", title: "Grammar: Adjective Agreement", html: `<p>Remember — adjectives agree with their noun in gender. The question <code>Jaký/Jaká/Jaké je...?</code> asks "what is ... like?" and also agrees with gender.</p><p><strong>Test yourself:</strong> Cover the Czech and from the English decide the gender, then say the Czech adjective ending.</p><p><strong>Long vowels change meaning:</strong> <em>byt</em> (apartment) ≠ <em>být</em> (to be). The accent is like a Hindi matra — always pronounce it distinctly longer.</p>` },
+      { type: "quiz", title: "Quick Check", items: [
+        { q: "What ending does a masculine adjective take? Give an example.", a: "-ý: dobrý papír, velký stůl" },
+        { q: "How do you say 'That coffee is good' in Czech?", a: "Ta káva je dobrá. (feminine → dobrá)" },
+        { q: "What is the difference between 'byt' and 'být'?", a: "byt = apartment; být = to be. The accent (long í) changes meaning entirely." },
+        { q: "How do you ask 'What is it like?' for a masculine noun?", a: "Jaký je ten...?" },
+      ]},
       { type: "pdfs", files: [
         { label: "Pronunciation Dialogues", pages: "pp. 29–50", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
       ]},
@@ -537,7 +688,30 @@ const COURSES = [
     audio: `${DLG}/Tape 04 Vol 01 Less 08.mp3`,
     audioLabel: "Tape 04 — Lesson 8",
     sections: [
-      { type: "intro", text: "<strong>Focus:</strong> Verb <em>být</em> (to be) — all persons. Negation with <em>ne-</em>. Diphthong <em>ej</em>, clusters pr/tl/kr." },
+      { type: "teacher", title: "The Verb 'to be' — Your Most Important Czech Verb", html: `
+        <div class="teacher-note">
+          Today you learn <strong>být</strong> (to be) — the most important verb in any language. You already know <em>je</em> (is) from lesson 1. Now you get the whole family.<br><br>
+          Hindi comparison: <em>हूँ, है, हैं, हो</em> — Czech also changes by person. Watch the pattern — it is not random.
+        </div>
+        <div class="scene">┌──────────────────────────────────────────────────────────────────────┐
+│  BÝT = TO BE (present tense)                                         │
+│                                                                      │
+│  já   <span class="label">jsem</span>   I am         │   já   <span class="label">nejsem</span>   I am not      │
+│  ty   <span class="label">jsi</span>    you are      │   ty   <span class="label">nejsi</span>    you aren't    │
+│  on   <span class="label">je</span>     he/she/it    │   on   <span class="label">není</span>     he isn't      │
+│  my   <span class="label">jsme</span>   we are       │   my   <span class="label">nejsme</span>   we aren't     │
+│  vy   <span class="label">jste</span>   you (pl.)    │   vy   <span class="label">nejste</span>   you aren't    │
+│  oni  <span class="label">jsou</span>   they are     │   oni  <span class="label">nejsou</span>   they aren't   │
+│                                                                      │
+│  Negation = add  ne-  to the front. That's it!                       │
+└──────────────────────────────────────────────────────────────────────┘</div>` },
+      { type: "berlitz", title: "Picture It — Who Are You?", items: [
+        { pic: "✈️", cz: "Já jsem letec.", en: "I am an airman.", note: "já = I. jsem = am. In Czech you can drop 'já' — the verb ending tells you it's 'I'." },
+        { pic: "🎓", cz: "Jste vy student?", en: "Are you a student?", note: "vy = you (formal/plural). Invert nothing — just rise in pitch." },
+        { pic: "🪖", cz: "Ne, já nejsem student.", en: "No, I am not a student.", note: "ne- prefix on jsem → nejsem. Simple!" },
+        { pic: "⭐", cz: "On je dobrý voják.", en: "He is a good soldier.", note: "voják = soldier. Good review of adjective agreement: dobrý (m)." },
+        { pic: "🗺️", cz: "Ta mapa není stará.", en: "That map is not old.", note: "není = is not. Same ne- rule on je → není." },
+      ]},
       { type: "dialogue", title: "Dialogue — Já nejsem vojín.", rows: [
         ["1","Dobré jitro. / Dobré jitro.","Good morning. / Good morning."],
         ["2","Jste vy letec?","Are you an airman?"],
@@ -566,7 +740,13 @@ const COURSES = [
         ["rotmistr","m.","staff sergeant"],["praporčík","m.","warrant officer"],
         ["kapitán","m.","captain"],["voják","m.","soldier"],["letec","m.","airman"],
       ]},
-      { type: "grammar", title: "Grammar: Negation", html: `<p>Negation = add <code>ne-</code> to the verb: <em>jsem → nejsem</em>, <em>je → není</em>, <em>jste → nejste</em>.</p><p>In colloquial speech, the <em>j</em> in <em>jsem/jste</em> is often silent (sounds like <em>sem/ste</em>). In <em>nejsem/nejste</em>, the <em>j</em> is always pronounced.</p>` },
+      { type: "grammar", title: "Grammar: Negation with ne-", html: `<p>Negation in Czech is beautifully simple: add <code>ne-</code> to any verb:<br><code>jsem → nejsem</code> | <code>je → není</code> | <code>jste → nejste</code> | <code>jsou → nejsou</code></p><p>In spoken Czech, <em>jsem/jste</em> often sounds like <em>sem/ste</em> — the j is swallowed. But in <em>nejsem/nejste</em> the j is always pronounced.</p>` },
+      { type: "quiz", title: "Quick Check", items: [
+        { q: "How do you say 'I am not a captain'?", a: "Já nejsem kapitán." },
+        { q: "How do you say 'He is not a soldier'?", a: "On není voják." },
+        { q: "What is the Czech for 'Good morning'?", a: "Dobré jitro." },
+        { q: "What does ne- do to a Czech verb?", a: "It negates it. jsem → nejsem (I am → I am not)." },
+      ]},
       { type: "pdfs", files: [
         { label: "Pronunciation Dialogues", pages: "pp. 51–66", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
       ]},
@@ -581,7 +761,29 @@ const COURSES = [
     audio: `${DLG}/Tape 05 Vol 01 Less 09.mp3`,
     audioLabel: "Tape 05 — Lesson 9",
     sections: [
-      { type: "intro", text: "<strong>Focus:</strong> Palatal nasal /ň/. Negation <em>není</em> with adjectives. Weather expressions. Nationality adjectives." },
+      { type: "teacher", title: "The /ň/ Sound — It's In Your Hindi Already!", html: `
+        <div class="teacher-note">
+          Today you meet <strong>ň</strong> — the palatal nasal. This is the "ny" sound in "canyon" or "onion". In Hindi, this is very similar to <em>ञ</em> (nya) or the anuswara before palatal consonants.<br><br>
+          Examples: <strong>pěkně</strong> (nicely) = pyekk-NYEH &nbsp;|&nbsp; <strong>snídaně</strong> (breakfast) = SNEE-da-nyeh<br><br>
+          <strong>Key rule:</strong> When <em>n</em> appears before <em>i</em> or <em>í</em>, it automatically becomes /ň/. So <em>ani</em> sounds like "a-nyi".
+        </div>
+        <div class="analogy-box">
+          <span class="lang-tag">Important</span> Nationality adjectives in Czech are <strong>never capitalized</strong> — unlike English. <em>anglický</em> (English), <em>český</em> (Czech), <em>indický</em> (Indian). Just as in Hindi, <em>हिंदी</em> is not "Hindi" with a capital — it is just the word.
+        </div>` },
+      { type: "sounds", title: "New Sounds This Lesson", items: [
+        { letter: "ň", like: "ny in 'canyon'", example: "pěkně = pyeknye" },
+        { letter: "ě", like: "ye (soft e)", example: "pěkně = pyeknye" },
+        { letter: "š", like: "sh in 'shop'", example: "snídaně = sneedanye" },
+        { letter: "č", like: "ch in 'church'", example: "dnes = dnes" },
+      ]},
+      { type: "berlitz", title: "Picture It — Weather and Daily Life", items: [
+        { pic: "☀️", cz: "Dnes je pěkně.", en: "Today it is nice.", note: "dnes = today. pěkně = nicely/pleasant. The ě makes the n soft." },
+        { pic: "❄️", cz: "Ne, dnes je zima.", en: "No, today it is cold.", note: "You already know zima! Review from lesson 2." },
+        { pic: "🌧️", cz: "Dnes není venku pěkně.", en: "Today it is not nice outside.", note: "není + adverb: use není for all genders when negating adverbs and weather." },
+        { pic: "🥐", cz: "Jaká je ta snídaně?", en: "What is that breakfast like?", note: "snídaně = breakfast. It ends in -ě — feminine gender." },
+        { pic: "📗", cz: "Ten český slovník je dobrý.", en: "That Czech dictionary is good.", note: "český = Czech (adj, masculine). NOT capitalized!" },
+        { pic: "📘", cz: "Ta anglická kniha je stará.", en: "That English book is old.", note: "anglická = English (adj, feminine). Still lowercase." },
+      ]},
       { type: "dialogue", title: "Dialogue — Jak je dnes?", rows: [
         ["1","Jak je dnes venku?","How is it outside today?"],
         ["","Dnes není venku pěkně.","Today it's not nice outside."],
@@ -599,10 +801,16 @@ const COURSES = [
       { type: "vocab", title: "Vocabulary", rows: [
         ["dnes","","today"],["pěkně","","nicely, pleasant (weather)"],
         ["snídaně","f.","breakfast"],["slovník","m.","dictionary"],["kniha","f.","book"],
-        ["český/á/é","","Czech"],["anglický/á/é","","English"],
+        ["český/á/é","","Czech (adj — lowercase!)"],["anglický/á/é","","English (adj — lowercase!)"],
         ["nízký/á/é","","low"],["vysoký/á/é","","high, tall"],
       ]},
-      { type: "grammar", title: "Grammar: Nationality Adjectives", html: `<p>Nationality adjectives follow the same gender rules. Note: in Czech they are <strong>not</strong> capitalized: <em>český slovník</em>, <em>anglická kniha</em>.</p><p>The palatal <strong>/ň/</strong>: like Spanish <em>ñ</em> or "ny" in "canyon". Spelled <em>ň</em> or appears automatically before <em>i/í</em>.</p>` },
+      { type: "grammar", title: "Grammar: Nationality Adjectives & /ň/", html: `<p>Nationality adjectives follow the same gender agreement rules. <strong>Key difference from English:</strong> they are never capitalized in Czech.<br><em>anglický slovník</em> (English dictionary), <em>český film</em> (Czech film)</p><p>The palatal <strong>/ň/</strong>: like "ny" in "canyon". Spelled <em>ň</em> explicitly, or triggered automatically when <em>n</em> precedes <em>i/í</em>.</p>` },
+      { type: "quiz", title: "Quick Check", items: [
+        { q: "How do you say 'Today it is cold' in Czech?", a: "Dnes je zima." },
+        { q: "What sound does ň make? Give an English example.", a: "Like 'ny' in 'canyon' or 'onion'" },
+        { q: "Should 'Czech' be capitalized as an adjective in Czech?", a: "No! český, anglický — always lowercase in Czech" },
+        { q: "What gender is 'snídaně' (breakfast)?", a: "Feminine — it ends in -e" },
+      ]},
       { type: "pdfs", files: [
         { label: "Pronunciation Dialogues", pages: "pp. 67–86", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
       ]},
@@ -617,7 +825,32 @@ const COURSES = [
     audio: `${DLG}/Tape 06 Vol 01 Less 10.mp3`,
     audioLabel: "Tape 06 — Lesson 10",
     sections: [
-      { type: "intro", text: "<strong>Focus:</strong> Accusative case — the form nouns take as direct objects. Verbs <em>mít</em> (have), <em>hledat</em> (look for), <em>vidět</em> (see)." },
+      { type: "teacher", title: "The Accusative Case — Like Hindi 'को' (ko)", html: `
+        <div class="teacher-note">
+          Today is a big day. You meet the <strong>accusative case</strong> — the form a noun takes when it is the <em>direct object</em> of a verb (the thing being acted upon).<br><br>
+          In Hindi, you mark the direct object with <em>को</em> (ko) for animate/definite objects: <em>मैं मानचित्र देखता हूँ</em> vs <em>मैं उसे देखता हूँ</em>. Czech handles this by <strong>changing the ending of the noun itself</strong>.<br><br>
+          Good news: <strong>masculine inanimate</strong> and <strong>neuter</strong> nouns do NOT change. Only feminine nouns (and animate masculine — next lesson) change.
+        </div>
+        <div class="scene">┌──────────────────────────────────────────────────────────┐
+│  NOMINATIVE → ACCUSATIVE (direct object)                 │
+│                                                          │
+│  FEMININE -a   <span class="label">mapa → mapu</span>     ta → tu         │
+│  FEMININE -a   <span class="label">tužka → tužku</span>                   │
+│  FEMININE -e   <span class="label">židle → židli</span>                   │
+│  MASC. inanim. <span class="label">no change</span>      slovník → slovník│
+│  NEUTER        <span class="label">no change</span>      okno → okno      │
+│                                                          │
+│  TIP: If you see -u or -i ending on a noun after a verb, │
+│  that is the accusative. The noun is the object!         │
+└──────────────────────────────────────────────────────────┘</div>` },
+      { type: "berlitz", title: "Picture It — Having, Seeing, Searching", items: [
+        { pic: "👀", cz: "Vidím tu mapu.", en: "I see that map.", note: "mapu = accusative of mapa. tu = accusative of ta. Both changed!" },
+        { pic: "✏️", cz: "Hledám tužku.", en: "I am looking for a pencil.", note: "tužku = accusative of tužka. The -a became -u." },
+        { pic: "📚", cz: "On má slovník.", en: "He has a dictionary.", note: "slovník = no change! Masculine inanimate stays the same." },
+        { pic: "🗺️", cz: "Kdo má mapu?", en: "Who has the map?", note: "mapu = acc. of mapa. The captain HAS the map (map = object)." },
+        { pic: "🔍", cz: "On hledá slovník.", en: "He is looking for a dictionary.", note: "slovník = no change — masculine inanimate." },
+        { pic: "📄", cz: "Má nějaký papír.", en: "He has some paper.", note: "nějaký = some/any. papír = no change (masc. inanimate)." },
+      ]},
       { type: "dialogue", title: "Dialogue — Kdo má tužku?", rows: [
         ["1","Kdo má mapu?","Who has the map?"],
         ["","Ten kapitán má mapu.","That captain has the map."],
@@ -639,12 +872,19 @@ const COURSES = [
         ["vidím / vidíte / vidí","","I see / you see / he sees"],
         ["nějaký","","some, any"],
       ]},
-      { type: "grammar", title: "Grammar: Accusative Case", html: `<p>Direct objects take the <strong>accusative case</strong>:</p>
-<p><code>Feminine -a</code>: mapa → mapu, tužka → tužku<br>
-<code>Feminine -e</code>: židle → židli; demonstrative: ta → tu<br>
-<code>Neuter</code>: no change → to kolo, ten slovník (masc. inanimate: no change)<br>
-<code>Masculine animate</code>: different form — covered in Lesson 11</p>
-<p>Examples: <em>Vidím tu mapu.</em> | <em>Hledám tužku.</em></p>` },
+      { type: "grammar", title: "Grammar: Accusative Case Summary", html: `<p>Direct objects take the <strong>accusative case</strong>:</p>
+<p><code>Feminine -a → -u</code>: mapa → mapu, tužka → tužku, demonstrative: ta → tu<br>
+<code>Feminine -e → -i</code>: židle → židli<br>
+<code>Masculine inanimate</code>: no change — slovník, papír<br>
+<code>Neuter</code>: no change — okno, kolo<br>
+<code>Masculine animate</code>: different — covered in Lesson 11</p>
+<p>Like Hindi को (ko), the accusative marks what is BEING acted on. <em>Vidím tu mapu</em> = I see THAT MAP (map = being seen).</p>` },
+      { type: "quiz", title: "Quick Check", items: [
+        { q: "What is the accusative of 'mapa' (map)?", a: "mapu (-a → -u)" },
+        { q: "What is the accusative of 'slovník' (dictionary)?", a: "slovník — no change! It is masculine inanimate." },
+        { q: "How do you say 'I see that map'?", a: "Vidím tu mapu." },
+        { q: "What Czech word means 'some / any'?", a: "nějaký" },
+      ]},
       { type: "pdfs", files: [
         { label: "Pronunciation Dialogues", pages: "pp. 85–106", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
       ]},
@@ -659,7 +899,33 @@ const COURSES = [
     audio: `${DLG}/Tape 07 Vol 01 Less 11.mp3`,
     audioLabel: "Tape 07 — Lesson 11",
     sections: [
-      { type: "intro", text: "<strong>Focus:</strong> Accusative of animate masculine nouns and personal pronouns. Verbs <em>jít</em> (go), <em>vidět</em> (see), <em>znát/vědět</em> (know). Preposition <em>pro</em> (for/to get)." },
+      { type: "teacher", title: "Animate vs Inanimate — Czech Sees Them Differently!", html: `
+        <div class="teacher-note">
+          In Czech, <strong>living things</strong> (people, animals) and <strong>objects</strong> take different accusative forms for masculine nouns. This is not random — many languages treat animate/inanimate differently. Hindi does too: <em>मैं किताब देखता हूँ</em> (I see a book) vs <em>मैं उसे देखता हूँ</em> (I see him — 'him' changes).<br><br>
+          Today: masculine animate nouns change their ending in accusative. The type of change depends on whether the noun's stem is "hard" or "soft".
+        </div>
+        <div class="scene">┌──────────────────────────────────────────────────────────┐
+│  ACCUSATIVE — MASCULINE ANIMATE                          │
+│                                                          │
+│  HARD stem (most consonants):                            │
+│    student → <span class="label">studenta</span>   Novák → <span class="label">Nováka</span>          │
+│                                                          │
+│  SOFT stem (ends in -c, -č, -ř, -j, -l, -s, -z):        │
+│    letec  → <span class="label">letce</span>       Němec → <span class="label">Němce</span>           │
+│                                                          │
+│  Noun ends in -a (like surnames):                        │
+│    Svoboda → <span class="label">Svobodu</span>                              │
+│                                                          │
+│  Demonstrative: ten → <span class="label">toho</span> (animate only)         │
+│  Pronoun: on → <span class="label">ho</span> / jej                           │
+└──────────────────────────────────────────────────────────┘</div>` },
+      { type: "berlitz", title: "Picture It — Animate Accusative in Action", items: [
+        { pic: "🏃", cz: "Ten praporčík jde pro kpt. Nováka.", en: "The warrant officer goes to get Captain Novák.", note: "Nováka = accusative of Novák (hard stem → add -a)" },
+        { pic: "👁️", cz: "On nevidí kpt. Nováka.", en: "He doesn't see Captain Novák.", note: "nevidí = does not see (ne- prefix on vidí). Nováka = animate acc." },
+        { pic: "👁️", cz: "Ale vidí rtm. Němce.", en: "But he sees Sergeant Němec.", note: "Němce = accusative of Němec (soft stem ending -c → add -e)" },
+        { pic: "🔍", cz: "Hledá toho kapitána.", en: "He is looking for that captain.", note: "toho = accusative of ten (animate). kapitána = acc. of kapitán." },
+        { pic: "🪑", cz: "Kdo sedí tady?", en: "Who is sitting here?", note: "sedí = sits/is sitting. New verb! No accusative here." },
+      ]},
       { type: "dialogue", title: "Dialogue — On ho nezná, ale zná ji.", rows: [
         ["1","Kdo sedí tady?","Who is sitting here?"],
         ["","Tady sedí rotmistr Němec.","Staff Sergeant Němec is sitting here."],
@@ -682,11 +948,17 @@ const COURSES = [
         ["toho","","him/that (accusative of ten, animate)"],
       ]},
       { type: "grammar", title: "Grammar: Accusative Animate Masculine", html: `<p>Masculine animate nouns (people, animals) change in the accusative:</p>
-<p><code>Soft pattern</code> (ends in -c, -č, -ř, -j, -l, -s, -z): add <code>-e</code> → letec → letce, Němec → Němce<br>
-<code>Hard pattern</code> (ends in other consonants): add <code>-a</code> → student → studenta, Novák → Nováka<br>
+<p><code>Hard pattern</code>: add <code>-a</code> → student → studenta, Novák → Nováka<br>
+<code>Soft pattern</code> (ends in -c, -č, -ř, -j, -l, -s, -z): add <code>-e</code> → letec → letce, Němec → Němce<br>
 <code>Ends in -a</code>: add <code>-u</code> → Svoboda → Svobodu</p>
-<p>Demonstrative: ten → toho (animate)<br>
-Pronoun: on → ho/jej</p>` },
+<p>Demonstrative animate: ten → <code>toho</code> &nbsp;|&nbsp; Pronoun: on → <code>ho/jej</code></p>
+<p>Think: animate nouns are "worth more effort" — they get a special ending to distinguish subject from object.</p>` },
+      { type: "quiz", title: "Quick Check", items: [
+        { q: "What is the accusative of 'student'?", a: "studenta (hard stem → add -a)" },
+        { q: "What is the accusative of 'letec' (airman)?", a: "letce (soft stem ending -c → add -e)" },
+        { q: "How do you say 'He sees that captain' (use toho)?", a: "On vidí toho kapitána." },
+        { q: "What is the difference between znát and vědět?", a: "znát = to know a person; vědět = to know a fact" },
+      ]},
       { type: "pdfs", files: [
         { label: "Pronunciation Dialogues", pages: "pp. 107–126", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
       ]},
@@ -701,7 +973,41 @@ Pronoun: on → ho/jej</p>` },
     audio: `${DLG}/Tape 08 Vol 01 Less 12.mp3`,
     audioLabel: "Tape 08 — Lesson 12",
     sections: [
-      { type: "intro", text: "<strong>Focus:</strong> Syllabic consonants /l, r/ (as in <em>vlk</em> = wolf, <em>krk</em> = neck). Enclitic pronouns: mě, tě, ho, se. Accusative of personal pronouns continued." },
+      { type: "teacher", title: "Syllabic Consonants — Czech's Unique Superpower!", html: `
+        <div class="teacher-note">
+          Czech has something neither Hindi, Kannada, nor English has: <strong>syllabic consonants</strong>. The letters <strong>r</strong> and <strong>l</strong> can BE the vowel in a syllable — they carry the sound on their own.<br><br>
+          <strong>vlk</strong> (wolf) — say "vl-k" where the L is the vowel. No "i" or "u" between them. It sounds like "vllk" with a rolled L.<br>
+          <strong>krk</strong> (neck) — "kr-k" where R is the vowel. Like clearing your throat softly: "krrk".<br>
+          <strong>prst</strong> (finger) — "prs-t" — the R carries the syllable.<br><br>
+          Practice tip: start with the consonant cluster, hum lightly, and let the R or L vibrate naturally. You will get it!
+        </div>
+        <div class="scene">┌──────────────────────────────────────────────────────┐
+│  ENCLITIC PRONOUNS — Second Position Rule            │
+│                                                      │
+│  Czech short pronouns ALWAYS go in 2nd position:    │
+│  (after the first stressed word/phrase)              │
+│                                                      │
+│  Já ho hledám.    = I am looking for HIM.            │
+│  On mě zná.       = He knows ME.                     │
+│  Čeká na mě.      = He is waiting for ME.            │
+│                                                      │
+│  já → <span class="label">mě</span> (me)   ty → <span class="label">tě</span> (you)   on → <span class="label">ho</span> (him) │
+│  ona → <span class="label">ji</span> (her)  my → <span class="label">nás</span> (us)  vy → <span class="label">vás</span> (you)│
+└──────────────────────────────────────────────────────┘</div>` },
+      { type: "sounds", title: "Syllabic Consonants — Practice These!", items: [
+        { letter: "vlk", like: "wolf — l is the vowel", example: "say: vl-k (no vowel!)" },
+        { letter: "krk", like: "neck — r is the vowel", example: "say: kr-k (hum the r)" },
+        { letter: "prst", like: "finger — r carries it", example: "prs-t" },
+        { letter: "čtvrt", like: "quarter — r again", example: "čtvrt = one quarter" },
+      ]},
+      { type: "berlitz", title: "Picture It — Knowing and Waiting", items: [
+        { pic: "🦷", cz: "Mám bolení zubu.", en: "I have a toothache.", note: "bolení zubu = pain of tooth (genitive case — just memorize this phrase)" },
+        { pic: "😔", cz: "To je škoda.", en: "That's too bad / What a pity.", note: "škoda = pity, shame. Very common Czech expression!" },
+        { pic: "🩺", cz: "Já ho hledám.", en: "I am looking for him.", note: "ho = him (enclitic, 2nd position). I'm looking for the doctor." },
+        { pic: "👀", cz: "Vidím ho tam.", en: "I see him there.", note: "ho = him after the verb. 2nd position rule." },
+        { pic: "🤝", cz: "On mě zná.", en: "He knows me.", note: "mě = me (enclitic). On = He (1st position), mě = 2nd position." },
+        { pic: "⏳", cz: "Čeká na mě.", en: "He is waiting for me.", note: "čekat na + accusative = to wait for. mě = me." },
+      ]},
       { type: "dialogue", title: "Dialogue — Mám bolení zubu.", rows: [
         ["1","Jak se máte?","How are you?"],
         ["","Není to dobré. Mám bolení zubu.","Not good. I have a toothache."],
@@ -724,11 +1030,16 @@ Pronoun: on → ho/jej</p>` },
         ["ho/jej","","him (accusative)"],
         ["nás/vás","","us/you (accusative pl./formal)"],
       ]},
-      { type: "grammar", title: "Grammar: Personal Pronouns — Accusative", html: `<p>Accusative pronouns (short/enclitic forms — used after a verb or in mid-sentence):</p>
-<p><code>já → mě</code> (me) | <code>ty → tě</code> (you) | <code>on → ho</code> (him)<br>
-<code>ona → ji</code> (her) | <code>ono → ho</code> (it) | <code>my → nás</code> (us)<br>
-<code>vy → vás</code> (you pl./formal) | <code>oni → je</code> (them)</p>
-<p>Enclitics go in the second position in the sentence: <em>Já ho hledám.</em> (I am looking for him.)</p>` },
+      { type: "grammar", title: "Grammar: Enclitic Pronouns & Second Position", html: `<p>Accusative pronouns (short/enclitic forms):</p>
+<p><code>já → mě</code> | <code>ty → tě</code> | <code>on → ho</code> | <code>ona → ji</code> | <code>my → nás</code> | <code>vy → vás</code> | <code>oni → je</code></p>
+<p><strong>Second-position rule:</strong> These short forms never come first in a sentence. They go after the first stressed word or phrase:<br><em>Já ho hledám.</em> (not: Ho já hledám.)<br><em>On mě zná.</em> (not: Mě on zná.)</p>
+<p>Like Hindi enclitics (<em>मुझे, उसे</em>) which also cannot start a sentence.</p>` },
+      { type: "quiz", title: "Quick Check", items: [
+        { q: "What is a 'syllabic consonant'? Give a Czech example.", a: "A consonant that acts as the vowel of a syllable. vlk (wolf) — the l is the vowel." },
+        { q: "How do you say 'I see him'?", a: "Vidím ho. (ho = him, after the verb)" },
+        { q: "How do you say 'He knows me'?", a: "On mě zná. (mě = me, 2nd position)" },
+        { q: "What does 'škoda' mean?", a: "Pity / too bad. 'To je škoda' = That's a shame." },
+      ]},
       { type: "pdfs", files: [
         { label: "Pronunciation Dialogues", pages: "pp. 127–148", path: `${B}/t/Czech Basic Course/Pronunciation Dialogues Intro Vol.pdf` },
       ]},
