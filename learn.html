@@ -1050,7 +1050,65 @@ const COURSES = [
     tag: "Vol 1 · Review Tape", audio: `${DLG}/Tape 09 Vol 01 Less 01-11.mp3`,
     audioLabel: "Tape 09 — Lessons 1–11 Review",
     sections: [
-      { type: "intro", text: "Full review of Vol 1 Lessons 1–11. Listen without looking at notes first. This tape recaps all key dialogues and drills at natural pace." },
+      { type: "teacher", title: "Congratulations — 11 Lessons Done!", html: `
+        <div class="teacher-note">
+          You have completed the first 11 lessons of the Czech Basic Course. Before listening to this review tape, let us see exactly what you now know. This is a proud moment — you have covered the foundation of Czech grammar.<br><br>
+          <strong>What you have learned:</strong><br>
+          ✔ Noun genders (masculine / feminine / neuter) and how to spot them from endings<br>
+          ✔ The verb <em>být</em> (to be) — all persons, positive and negative<br>
+          ✔ Adjective agreement — endings change to match the noun's gender<br>
+          ✔ Accusative case — direct object; feminine -a → -u; animate masc adds -a or -e<br>
+          ✔ Personal pronouns — já, ty, on, ona, my, vy, oni — and their accusative forms (mě, tě, ho, ji...)<br>
+          ✔ Negation — just add <em>ne-</em> to any verb<br>
+          ✔ Questions by intonation; <em>co, kdo, kde, jak, jaký</em><br>
+          ✔ Key verbs: mít, hledat, vidět, znát, vědět, sedět, jít, čekat<br>
+          ✔ Weather, classroom, home, military vocabulary<br><br>
+          <strong>Tip for this tape:</strong> Listen once without reading. Then listen again and shadow (repeat each sentence immediately after the speaker). This is the Berlitz method — immerse first, analyse second.
+        </div>` },
+      { type: "teacher", title: "Grammar Map — Everything So Far", html: `
+        <div class="scene">┌──────────────────────────────────────────────────────────────┐
+│  CZECH GRAMMAR — WHAT YOU KNOW AFTER 11 LESSONS             │
+│                                                              │
+│  NOUNS                                                       │
+│  ├─ Gender: Masculine (consonant) │ Feminine (-a/-e)         │
+│  │                                │ Neuter (-o/-í)           │
+│  ├─ Nominative: subject form      mapa / student / okno      │
+│  └─ Accusative: object form       mapu / studenta / okno     │
+│                                                              │
+│  ADJECTIVES                                                  │
+│  └─ Agree with noun gender: dobrý / dobrá / dobré            │
+│     Demonstratives: ten / ta / to → toho / tu / to (acc)    │
+│                                                              │
+│  VERBS                                                       │
+│  ├─ být: jsem / jsi / je / jsme / jste / jsou                │
+│  ├─ Negation: ne- prefix → nejsem / není / nejsou            │
+│  ├─ mít: mám / máš / má / máme / máte / mají                 │
+│  └─ Other verbs: hledám / vidím / znám / sedím / čekám       │
+│                                                              │
+│  PRONOUNS (Accusative)                                       │
+│  já→mě  ty→tě  on→ho  ona→ji  my→nás  vy→vás  oni→je       │
+│  Enclitics go in 2nd position: "Já HO hledám."              │
+└──────────────────────────────────────────────────────────────┘</div>` },
+      { type: "berlitz", title: "Review — Mixed Sentences", items: [
+        { pic: "🗺️", cz: "Vidím tu mapu.", en: "I see that map.", note: "Review: accusative of ta mapa → tu mapu." },
+        { pic: "🪖", cz: "Já nejsem vojín. Jsem kapitán.", en: "I am not a private. I am a captain.", note: "Review: negation with nejsem + být." },
+        { pic: "🐕", cz: "Kde je pes? Pes je doma.", en: "Where is the dog? The dog is at home.", note: "Review: kde question + doma." },
+        { pic: "☕", cz: "Ta káva je dobrá, ale to mléko je špatné.", en: "That coffee is good, but that milk is bad.", note: "Review: adjective agreement + ale." },
+        { pic: "🩺", cz: "Hledám doktora. Vidíte ho?", en: "I am looking for the doctor. Do you see him?", note: "Review: accusative animate + enclitic ho." },
+        { pic: "❄️", cz: "Dnes není venku pěkně. Je zima.", en: "Today it is not nice outside. It is cold.", note: "Review: weather expressions." },
+        { pic: "✏️", cz: "Má ten rotmistr tužku a papír?", en: "Does the staff sergeant have a pencil and paper?", note: "Review: mít + accusative." },
+        { pic: "🤝", cz: "On mě zná a čeká na mě.", en: "He knows me and is waiting for me.", note: "Review: enclitic mě in two positions." },
+      ]},
+      { type: "quiz", title: "Review Quiz — 8 Questions", items: [
+        { q: "What are the three genders in Czech? Give one example word for each.", a: "Masculine: student / Feminine: mapa / Neuter: okno" },
+        { q: "How do you say 'I am not a soldier' in Czech?", a: "Já nejsem voják." },
+        { q: "What is the accusative of 'ta mapa'?", a: "tu mapu (ta → tu, mapa → mapu)" },
+        { q: "What is the difference between 'znát' and 'vědět'?", a: "znát = to know a person; vědět = to know a fact" },
+        { q: "Where do enclitic pronouns (mě, ho, ji) go in a sentence?", a: "Always in 2nd position — after the first stressed word." },
+        { q: "How do you make a yes/no question in Czech?", a: "Rising intonation only — no word order change needed." },
+        { q: "What is the accusative of 'letec' (animate masculine)?", a: "letce (soft stem -c → add -e)" },
+        { q: "How do you say 'Today it is cold outside'?", a: "Dnes je venku zima." },
+      ]},
       { type: "pdfs", files: [
         { label: "Cartoon Guides Less 1–95", path: `${B}/t/Czech Basic Course/Cartoon Guides Less 01-95.pdf` },
         { label: "Standard Situations & Stories", path: `${B}/t/Czech Basic Course/Standard Situations & Stories Cartoons.pdf` },
@@ -1062,7 +1120,77 @@ const COURSES = [
     tag: "Vol 1 · Lessons 12–20", audio: `${DLG}/Tape 10 Vol 01 Less 12-20.mp3`,
     audioLabel: "Tape 10 — Lessons 12–20",
     sections: [
-      { type: "intro", text: "Lessons 12–20 cover: locative case, dative case, genitive case, present tense of type-1 verbs, and expanded vocabulary." },
+      { type: "teacher", title: "Czech Has 7 Cases — Don't Panic!", html: `
+        <div class="teacher-note">
+          English uses word order to show meaning: "Dog bites man" ≠ "Man bites dog". Czech uses <strong>case endings</strong> — the word's ending changes to show its role in the sentence. You already know two cases: Nominative (subject) and Accusative (object). Now you meet three more.<br><br>
+          Think of it like this: in Hindi, you have postpositions — <em>को, में, से, के लिए, का/के/की</em>. In Czech, instead of adding a word after the noun, you <strong>change the noun's ending</strong>. Same idea, different technique. Once you feel this connection, cases become much less scary.
+        </div>` },
+      { type: "teacher", title: "The 7 Cases — Visual Map", html: `
+        <div class="scene">┌─────────────────────────────────────────────────────────────────┐
+│  CZECH CASES — What Each One Does (example: mapa = map)        │
+│                                                                 │
+│  1. NOMINATIVE   Subject — who does the action   mapa           │
+│  2. ACCUSATIVE   Direct object — acted upon      mapu  (→ -u)  │
+│  3. GENITIVE     Of / from / possession          mapy  (→ -y)  │
+│  4. DATIVE       To / for — indirect object      mapě  (→ -ě)  │
+│  5. LOCATIVE     About/in/on — always after prep mapě  (→ -ě)  │
+│  6. INSTRUMENTAL By / with — means or manner     mapou (→ -ou) │
+│  7. VOCATIVE     Calling someone directly        mapo!          │
+│                                                                 │
+│  Hindi equivalents:                                             │
+│  Genitive = का/के/की  │  Dative = को/के लिए                    │
+│  Locative = में/पर    │  Instrumental = से                     │
+│                                                                 │
+│  TIP: Locative NEVER appears without a preposition.             │
+└─────────────────────────────────────────────────────────────────┘</div>` },
+      { type: "teacher", title: "Locative Case — 'In' and 'About'", html: `
+        <div class="teacher-note">
+          The <strong>locative</strong> is used ONLY after prepositions: <em>v</em> (in), <em>na</em> (on), <em>o</em> (about), <em>při</em> (at/during), <em>po</em> (after/around).<br><br>
+          It is like Hindi <em>में</em> (mein) = in. <strong>V Praze</strong> = In Prague. <strong>Na stole</strong> = On the table.<br><br>
+          Key rule: <em>Praha</em> (Prague) → <em>v Praze</em>. The noun changes ending. You cannot say <em>v Praha</em> — that is wrong. The locative form is required after every preposition of location.
+        </div>` },
+      { type: "teacher", title: "Dative Case — 'To' and 'For'", html: `
+        <div class="teacher-note">
+          The <strong>dative</strong> marks the indirect object — the person TO whom or FOR whom something is done.<br><br>
+          Hindi equivalent: <em>के लिए</em> (ke liye) or <em>को</em> (ko) for indirect objects.<br><br>
+          <em>Dám Novákovi slovník.</em> = I give Novák the dictionary. (Novák → Novákovi in dative)<br>
+          <em>Řeknu kapitánovi.</em> = I will tell the captain. (kapitán → kapitánovi)
+        </div>` },
+      { type: "berlitz", title: "Picture It — Cases in Action", items: [
+        { pic: "🏙️", cz: "Jsem v Praze.", en: "I am in Prague.", note: "v + locative: Praha → Praze. The -a ending becomes -ě after v." },
+        { pic: "📖", cz: "Kniha je na stole.", en: "The book is on the table.", note: "na + locative: stůl → stole. Masculine locative adds -e." },
+        { pic: "🗣️", cz: "Mluvím o mapě.", en: "I am talking about the map.", note: "o + locative: mapa → mapě. Same ending as dative!" },
+        { pic: "🎁", cz: "Dám slovník Novákovi.", en: "I give the dictionary to Novák.", note: "Dative: Novák → Novákovi. Indirect object — the receiver." },
+        { pic: "🏠", cz: "To je dům pana Nováka.", en: "That is Mr. Novák's house.", note: "Genitive: Novák → Nováka after pan. Possession = genitive." },
+        { pic: "🚫", cz: "Není tady žádné pivo.", en: "There is no beer here.", note: "žádný/á/é = no, none. žádné pivo (neuter accusative)." },
+        { pic: "⏰", cz: "Čekám na konci ulice.", en: "I am waiting at the end of the street.", note: "na + locative: konec → konci. ulice (street) = feminine." },
+      ]},
+      { type: "vocab", title: "Key New Words", rows: [
+        ["v / ve","","in (+ locative)"],
+        ["na","","on / at (+ locative or accusative)"],
+        ["o","","about (+ locative)"],
+        ["Praha / Praze","f.","Prague (nominative / locative)"],
+        ["Brno / Brně","n.","Brno (nominative / locative)"],
+        ["ulice","f.","street"],
+        ["dům","m.","house"],
+        ["konec","m.","end"],
+        ["mluvím / mluvit","","I speak / to speak"],
+        ["dám / dát","","I give / to give"],
+        ["žádný/á/é","","no, none, not any"],
+      ]},
+      { type: "grammar", title: "Type-1 Verbs: the -ám Conjugation", html: `<p>Many Czech verbs follow the <strong>-ám</strong> pattern (also called type 1 or first conjugation):</p>
+<p><code>dělat</code> (to do): dělám / děláš / dělá / děláme / děláte / dělají<br>
+<code>hledat</code> (to look for): hledám / hledáš / hledá…<br>
+<code>čekat</code> (to wait): čekám / čekáš / čeká…<br>
+<code>mluvit</code> (to speak): mluvím / mluvíš / mluví… (note: -ím ending variant)</p>
+<p>The infinitive ends in <strong>-at</strong> or <strong>-it/-et</strong>. Remove the ending, add the person ending. You already know several of these verbs!</p>` },
+      { type: "quiz", title: "Quick Check", items: [
+        { q: "What case is used after 'v' (in)?", a: "Locative — always after location prepositions." },
+        { q: "How do you say 'in Prague'?", a: "v Praze (Praha → Praze in locative)" },
+        { q: "What is the Hindi equivalent of the dative case?", a: "के लिए (ke liye) or को (ko) for indirect objects." },
+        { q: "What does 'žádný' mean? Use it in a sentence.", a: "no / none. Není tady žádné pivo = There is no beer here." },
+        { q: "What is the one rule about the locative case?", a: "It NEVER appears without a preposition." },
+      ]},
       { type: "pdfs", files: [
         { label: "Textbook Vol 1 (Less 1–20)", path: `${B}/t/Czech Basic Course/Vol 01 Less 01-20 Writing-Intermediate Phase.pdf` },
         { label: "Grammar Exercises Part 1", path: `${B}/t/Czech Basic Course/Vol 01 Part 01 Less 01-19 Grammar Practice Exercises.pdf` },
@@ -1074,7 +1202,74 @@ const COURSES = [
     tag: "Vol 2 · Lessons 21–29", audio: `${DLG}/Tape 11 Vol 02 Less 21-29.mp3`,
     audioLabel: "Tape 11 — Lessons 21–29",
     sections: [
-      { type: "intro", text: "Vol 2 begins. Topics include: past tense of verbs, instrumental case, numbers in context, more complex sentence structures." },
+      { type: "teacher", title: "Welcome to Vol 2 — Past Tense!", html: `
+        <div class="teacher-note">
+          Welcome to Vol 2! You now know enough Czech to have basic conversations. Time to talk about the past.<br><br>
+          Czech past tense is formed with a <strong>participle + the verb být</strong>. The participle changes ending based on the <strong>gender of the subject</strong> — just like Hindi past tense!<br><br>
+          Hindi: <em>वह गया</em> (he went, masc) vs <em>वह गई</em> (she went, fem). Czech does the same:<br>
+          <em>On šel</em> (he went) vs <em>Ona šla</em> (she went) — the participle changes with gender!<br><br>
+          This is one of the most natural things for a Hindi speaker to pick up. Trust the pattern.
+        </div>` },
+      { type: "teacher", title: "Past Tense Formation — Full Table", html: `
+        <div class="scene">┌────────────────────────────────────────────────────────────────┐
+│  PAST TENSE = Participle + být (in 2nd position)               │
+│                                                                │
+│  Infinitive → remove -t → add gender ending                   │
+│  Example: dělat (to do)                                        │
+│                                                                │
+│  MASCULINE                    FEMININE                         │
+│  já   dělal jsem  (I did)     já   dělala jsem                 │
+│  ty   dělal jsi   (you did)   ty   dělala jsi                  │
+│  on   dělal       (he did)    ona  dělala       (she did)      │
+│  my   dělali jsme (we did)    my   dělaly jsme                 │
+│  oni  dělali      (they did)  ony  dělaly                      │
+│                                                                │
+│  KEY RULE: být forms (jsem/jsi/jsme) go in 2ND POSITION!      │
+│  "Já jsem dělal" is WRONG. → "Já dělal jsem" ✓               │
+│  Or just: "Dělal jsem." (já is optional)                       │
+│                                                                │
+│  Hindi parallel: वह गया (on šel) vs वह गई (ona šla)           │
+└────────────────────────────────────────────────────────────────┘</div>` },
+      { type: "teacher", title: "Instrumental Case — 'With' and 'By Means Of'", html: `
+        <div class="teacher-note">
+          The <strong>instrumental</strong> case answers: "with what?" or "by means of what?"<br><br>
+          Hindi equivalent: <em>से</em> (se) for instrument or means: <em>कलम से लिखना</em> (to write with a pen).<br><br>
+          In Czech: <em>Píšu tužkou.</em> = I write with a pencil. (tužka → tužkou — adds <strong>-ou</strong> for feminine -a nouns)<br>
+          <em>Jel autem.</em> = He went by car. (auto → autem — neuter adds <strong>-em</strong>)<br>
+          <em>Přišel s Novákem.</em> = He came with Novák. (s/se + instrumental = with a person)
+        </div>` },
+      { type: "berlitz", title: "Picture It — Past and Instrumental", items: [
+        { pic: "✍️", cz: "Psal jsem dopis.", en: "I wrote a letter.", note: "psal jsem = I wrote (past masc). psát → psal. být in 2nd position." },
+        { pic: "📞", cz: "Mluvila jsem česky.", en: "I spoke Czech.", note: "mluvila jsem = I spoke (past fem). Note the -a ending for female speaker!" },
+        { pic: "✏️", cz: "Píšu tužkou.", en: "I write with a pencil.", note: "tužkou = instrumental of tužka. Feminine -a → -ou." },
+        { pic: "🚗", cz: "Jel autem.", en: "He went by car.", note: "autem = instrumental of auto. Neuter -o → -em." },
+        { pic: "🤝", cz: "Přišel s Novákem.", en: "He came with Novák.", note: "s + instrumental = with. Novák → Novákem (masc hard → -em)." },
+        { pic: "🏃", cz: "Šli jsme rychle.", en: "We went quickly.", note: "šli jsme = we went (plural masc past of jít). rychle = quickly." },
+        { pic: "📅", cz: "Byl jsem v Praze.", en: "I was in Prague.", note: "byl jsem = I was (past of být, masc). Two cases: past tense + locative." },
+      ]},
+      { type: "vocab", title: "Key Verbs — Infinitive / Present / Past", rows: [
+        ["psát / píšu / psal","","to write / I write / wrote"],
+        ["mluvit / mluvím / mluvil","","to speak / I speak / spoke"],
+        ["jít / jdu / šel","","to go on foot / I go / went"],
+        ["jet / jedu / jel","","to go by vehicle / I go / went"],
+        ["přijít / přišel","","to come / came"],
+        ["dělat / dělám / dělal","","to do / I do / did"],
+        ["auto","n.","car"],
+        ["rychle","","quickly"],
+        ["s / se + instr.","","with (a person or object)"],
+      ]},
+      { type: "grammar", title: "Verb Aspect — Your First Glimpse", html: `<p>Czech verbs come in <strong>aspect pairs</strong> — imperfective (ongoing or repeated) and perfective (completed, one-time):</p>
+<p><code>psát</code> (to write, ongoing) vs <code>napsat</code> (to write and finish)<br>
+<code>dělat</code> (to do, repeatedly) vs <code>udělat</code> (to do and complete)</p>
+<p>In the past tense this matters: <em>Psal jsem dopis</em> = I was writing a letter (maybe not finished). <em>Napsal jsem dopis</em> = I wrote the letter (and finished it).</p>
+<p>For now, just notice when you hear the <em>na-/u-/po-/při-</em> prefix on a familiar verb — it usually signals the perfective form. This will become very important in Vol 2 and beyond.</p>` },
+      { type: "quiz", title: "Quick Check", items: [
+        { q: "How do you form Czech past tense?", a: "Participle (remove -t from infinitive, add gender ending) + být in 2nd position." },
+        { q: "How is Czech past tense like Hindi?", a: "Both change the verb ending based on the gender of the subject. वह गया = on šel; वह गई = ona šla." },
+        { q: "How do you say 'I wrote a letter' (male speaker)?", a: "Psal jsem dopis." },
+        { q: "What case is used after 's' (with)?", a: "Instrumental — s Novákem (with Novák)." },
+        { q: "What is the difference between psát and napsat?", a: "psát = imperfective (ongoing writing); napsat = perfective (writing completed)." },
+      ]},
       { type: "pdfs", files: [
         { label: "Textbook Vol 2 (Less 21–45)", path: `${B}/t/Czech Basic Course/Vol 02 Less 21-45.pdf` },
         { label: "Grammar Exercises Part 2", path: `${B}/t/Czech Basic Course/Vol 01 Part 02 Less 21-44 Grammar Practice Exercises.pdf` },
